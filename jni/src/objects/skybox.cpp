@@ -60,7 +60,7 @@ Skybox::Skybox(Engine &engine) {
     glActiveTexture (GL_TEXTURE0);
     glBindTexture (GL_TEXTURE_CUBE_MAP, textures);
 
-    sun = unique_ptr<Sun> (new Sun (glm::vec3(engine.state.lightPos), engine.width/8.0));
+    sun = unique_ptr<Sun> (new Sun (vec3(engine.state.lightPos), engine.width/8.0));
 }
 
 Skybox::~Skybox () {
@@ -83,8 +83,8 @@ Skybox::~Skybox () {
 void Skybox::draw (Engine &engine) {
     glUseProgram (program);
 
-    glm::mat4 mvp = engine.projectionMatrix * engine.viewMatrix;
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (mvp));
+    mat4 mvp = engine.projectionMatrix * engine.viewMatrix;
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
 
 //    glActiveTexture (GL_TEXTURE0);
 //    glBindTexture (GL_TEXTURE_CUBE_MAP, textures);

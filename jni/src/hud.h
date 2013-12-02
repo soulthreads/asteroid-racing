@@ -3,8 +3,6 @@
 
 #include "engine.h"
 
-using namespace std;
-
 class Hud
 {
 private:
@@ -21,14 +19,14 @@ private:
     GLuint stride;
 
     GLuint controllerTex, controllerBgTex, throttleTex, fireTex;
-    glm::vec3 controllerCenter, throttleCenter, fireCenter;
-    glm::vec3 controllerOffset;
+    vec3 controllerCenter, throttleCenter, fireCenter;
+    vec3 controllerOffset;
     static const float controllerBgSize = 0.4;
     static const float controllerSize = 0.2;
     static const float throttleSize = 0.2;
     static const float fireSize = 0.2;
 
-    glm::mat4 modelMatrix;
+    mat4 modelMatrix;
 
 public:
     Hud(Engine &engine);

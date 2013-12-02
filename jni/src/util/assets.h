@@ -8,7 +8,7 @@
 #include <android/asset_manager_jni.h>
 #include <png.h>
 
-using namespace std;
+using std::string;
 
 typedef struct {
     const size_t length;

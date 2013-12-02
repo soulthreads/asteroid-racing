@@ -65,10 +65,10 @@ Cube::~Cube () {
     }
 }
 
-void Cube::draw (glm::mat4 mvp) {
+void Cube::draw (mat4 mvp) {
     glUseProgram (program);
 
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (mvp));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
 
     glBindBuffer (GL_ARRAY_BUFFER, vbo);
     glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), 0);

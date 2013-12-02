@@ -15,10 +15,10 @@ private:
 
     GLuint sunTex;
 
-    glm::vec3 position;
+    vec3 position;
     float size;
 public:
-    Sun(glm::vec3 sunPosition, float sunSize);
+    Sun(vec3 sunPosition, float sunSize);
     ~Sun ();
     void draw (Engine &engine);
 };

@@ -111,7 +111,7 @@ ImageData loadImageFromPngAsset (const string &pngPath) {
 
     png_bytep rowPtrs [height];
 
-    for (png_uint_32 i = 0; i < height; i++) {
+    for (png_uint_32 i = 0; i < height; ++i) {
         rowPtrs[i] = rawImage + i * rowSize;
     }
 
@@ -156,7 +156,7 @@ GLuint loadCubeMapFromAssets (const string paths[]) {
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     ImageData pngs[6];
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
         pngs[i] = loadImageFromPngAsset (paths[i]);
         glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_RGBA,
                       pngs[0].width, pngs[0].height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pngs[i].data);
@@ -164,7 +164,7 @@ GLuint loadCubeMapFromAssets (const string paths[]) {
 
     glBindTexture (GL_TEXTURE_CUBE_MAP, 0);
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
         delete [] pngs[i].data;
     }
 
@@ -222,7 +222,7 @@ GLuint loadObjFromAssets (const string &pathToObj, const string &pathToMtl, GLui
         } else if (key == "f") {
             string word;
             int v, t, n;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; ++i) {
                 lstr >> word;
                 if (word.find ("//")) {
                     sscanf (word.c_str (), "%d//%d", &v, &n);

@@ -1,16 +1,7 @@
 #ifndef OBJMODEL_H
 #define OBJMODEL_H
 
-#include <string>
-
-#include <GLES2/gl2.h>
-#include <GLES2/gl2ext.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "assets.h"
-#include "shader.h"
+#include "engine.h"
 
 class ObjModel
 {
@@ -32,7 +23,7 @@ private:
 public:
     ObjModel (const string &pathToObj, const string &pathToMtl);
     ~ObjModel ();
-    void draw (glm::mat4 mvp, glm::mat4 mv, glm::vec3 lighPos, glm::vec3 eyePos);
+    void draw (mat4 mvp, mat4 mv, vec3 lighPos, vec3 eyePos);
     void drawDepth();
 };
 

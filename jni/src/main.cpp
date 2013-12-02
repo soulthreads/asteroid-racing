@@ -12,18 +12,14 @@
 #define LOG_TAG "AsteroidRacing"
 #include "util/logs.h"
 
-#include "util/shader.h"
-#include "util/assets.h"
-
+#include "hud.h"
 #include "objects/cube.h"
 #include "objects/skybox.h"
 #include "objects/ship.h"
-#include "hud.h"
 #include "objects/particles.h"
+#include "objects/asteroids.h"
 
-using namespace std;
-
-unique_ptr<Cube> cube;
+unique_ptr<Asteroids> ast;
 unique_ptr<Skybox> skybox;
 unique_ptr<Ship> ship;
 unique_ptr<Hud> hud;
@@ -90,16 +86,16 @@ static int engineInitDisplay (Engine &engine) {
     glEnable (GL_CULL_FACE);
     glEnable (GL_DEPTH_TEST);
 
-    engine.projectionMatrix = glm::perspective (60.0f, ((float)w)/h, 0.1f, 1000.0f);
-    engine.orthoMatrix = glm::ortho (-(engine.aspectRatio), +engine.aspectRatio,
+    engine.projectionMatrix = perspective (60.0f, ((float)w)/h, 0.1f, 1000.0f);
+    engine.orthoMatrix = ortho (-(engine.aspectRatio), +engine.aspectRatio,
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
-    cube = unique_ptr<Cube>(new Cube);
-    skybox = unique_ptr<Skybox>(new Skybox (engine));
-    ship = unique_ptr<Ship> (new Ship (engine));
     hud = unique_ptr<Hud> (new Hud (engine));
 
-    envp = unique_ptr<Particles> (new Particles (glm::vec3 (1,1,0.5), 256, w/4, 1/1024.0));
+    skybox = unique_ptr<Skybox>(new Skybox (engine));
+    ship = unique_ptr<Ship> (new Ship (engine));
+    envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/4, 1/1024.0));
+    ast = unique_ptr<Asteroids> (new Asteroids);
 
     return 0;
 }
@@ -120,28 +116,25 @@ static void engineDrawFrame (Engine &engine) {
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    glm::vec3 dv = engine.state.shipQuat * glm::vec3 (0, 0, 1);
-    glm::vec3 up = engine.state.shipQuat * glm::vec3 (0, 1, 0);
-    glm::vec3 rt = engine.state.shipQuat * glm::vec3 (1, 0, 0);
+    vec3 dv = engine.state.shipQuat * vec3 (0, 0, 1);
+    vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
+    vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
-    glm::vec3 offset = engine.state.camRot[0] * rt - engine.state.camRot[1] * up + 2.0f * dv;
+    vec3 offset = engine.state.camRot[0] * rt - engine.state.camRot[1] * up + 2.0f * dv;
     engine.state.camRot *= 0.95f;
 
-    engine.viewMatrix = glm::lookAt (glm::vec3 (0), offset, up);
+    engine.viewMatrix = lookAt (vec3 (0), offset, up);
     skybox->draw (engine);
 
     ship->update (engine);
     engine.state.eyePos = engine.state.shipPos - offset;
-    engine.viewMatrix = glm::lookAt (engine.state.eyePos, engine.state.shipPos, up);
+    engine.viewMatrix = lookAt (engine.state.eyePos, engine.state.shipPos, up);
 
-    glm::mat4 modelMatrix = glm::translate (glm::mat4(1), glm::vec3(0, 0, 5));
-    glm::mat4 mvpMatrix = engine.projectionMatrix * engine.viewMatrix * modelMatrix;
-    cube->draw (mvpMatrix);
+    ast->draw (engine);
 
     ship->draw (engine);
 
-    envp->addParticles (engine.state.shipPos+glm::ballRand (100.0f)+engine.state.shipVel,
-                        glm::vec3 (0), 1);
+    envp->addParticles (engine.state.shipPos+ballRand (100.0f)+engine.state.shipVel, vec3 (0), 1);
     envp->draw (engine);
 
     hud->draw (engine);
@@ -156,11 +149,11 @@ static void engineDrawFrame (Engine &engine) {
  * Tear down the EGL context currently associated with the display.
  */
 static void engineTermDisplay (Engine &engine) {
-    cube.reset ();
+    hud.reset ();
     skybox.reset ();
     ship.reset ();
-    hud.reset ();
     envp.reset ();
+    ast.reset ();
 
     if (engine.display != EGL_NO_DISPLAY) {
         eglMakeCurrent (engine.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -272,10 +265,10 @@ void android_main(struct android_app* state) {
         // We are starting with a previous saved state; restore from it.
         engine.state = *(struct saved_state*)state->savedState;
     } else {
-        engine.state.shipQuat = glm::angleAxis (0.f, glm::vec3 (0, 0, 1));
-        engine.state.shipPos = glm::vec3(0);
-        engine.state.shipVel = glm::vec3(0);
-        engine.state.lightPos = glm::vec4 (-1000, 0, 0, 1);
+        engine.state.shipQuat = angleAxis (0.f, vec3 (0, 0, 1));
+        engine.state.shipPos = vec3(0);
+        engine.state.shipVel = vec3(0);
+        engine.state.lightPos = vec4 (-1000, 0, 0, 1);
         engine.state.throttle = false;
     }
 

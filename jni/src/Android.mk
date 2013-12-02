@@ -19,7 +19,7 @@ LOCAL_SRC_FILES := main.cpp \
         objects/ship.cpp \
         hud.cpp \
         objects/particles.cpp \
-        objects/asteroid.cpp
+        objects/asteroids.cpp
 
 LOCAL_SHARED_LIBRARIES := png
 LOCAL_STATIC_LIBRARIES := android_native_app_glue

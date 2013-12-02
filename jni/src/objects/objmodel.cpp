@@ -27,13 +27,13 @@ ObjModel::~ObjModel () {
     }
 }
 
-void ObjModel::draw (glm::mat4 mvp, glm::mat4 mv, glm::vec3 lighPos, glm::vec3 eyePos) {
+void ObjModel::draw (mat4 mvp, mat4 mv, vec3 lighPos, vec3 eyePos) {
     glUseProgram (program);
 
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (mvp));
-    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, glm::value_ptr (mv));
-    glUniform3fv (u_LightPosHandle, 1, glm::value_ptr (lighPos));
-    glUniform3fv (u_EyePosHandle, 1, glm::value_ptr (eyePos));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
+    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mv));
+    glUniform3fv (u_LightPosHandle, 1, value_ptr (lighPos));
+    glUniform3fv (u_EyePosHandle, 1, value_ptr (eyePos));
 
     glBindBuffer (GL_ARRAY_BUFFER, vbo);
 

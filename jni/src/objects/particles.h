@@ -3,8 +3,6 @@
 
 #include "engine.h"
 
-using namespace std;
-
 class Particles
 {
 private:
@@ -21,11 +19,11 @@ private:
     float particleSize;
     float decayFactor;
 
-    glm::vec3 particlesColor;
+    vec3 particlesColor;
     GLuint maxCount;
     typedef struct {
-        glm::vec3 position;
-        glm::vec3 velocity;
+        vec3 position;
+        vec3 velocity;
         float lifeTime;
     } particle;
 
@@ -36,10 +34,10 @@ private:
     size_t cursor;
 
 public:
-    Particles(glm::vec3 color, GLuint maxParticles, GLfloat size, float decay);
+    Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay);
     ~Particles();
     void draw (Engine &engine);
-    void addParticles (glm::vec3 position, glm::vec3 velocity, int count);
+    void addParticles (vec3 position, vec3 velocity, int count);
 };
 
 #endif // PARTICLES_H

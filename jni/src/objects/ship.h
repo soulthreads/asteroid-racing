@@ -2,8 +2,6 @@
 #define SHIP_H
 
 #include "engine.h"
-#include "util/assets.h"
-#include "util/shader.h"
 #include "particles.h"
 
 class Ship
@@ -22,7 +20,7 @@ private:
     GLuint vbo;
     GLuint stride, nvertices;
 
-    glm::mat4 modelMatrix, mvMatrix, mvpMatrix;
+    mat4 modelMatrix, mvMatrix, mvpMatrix;
 
     unique_ptr<Particles> particles;
 

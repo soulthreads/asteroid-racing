@@ -1,6 +1,4 @@
 #include "hud.h"
-#include "util/assets.h"
-#include "util/shader.h"
 
 Hud::Hud(Engine &engine)
 {
@@ -29,8 +27,8 @@ Hud::Hud(Engine &engine)
     controllerBgTex = loadTextureFromAsset ("textures/controller_bg.png");
     throttleTex = loadTextureFromAsset ("textures/throttle.png");
 
-    controllerCenter = glm::vec3 (-engine.aspectRatio+controllerBgSize, -1+controllerBgSize, 0);
-    throttleCenter = glm::vec3 (engine.aspectRatio-throttleSize, -1+throttleSize, 0);
+    controllerCenter = vec3 (-engine.aspectRatio+controllerBgSize, -1+controllerBgSize, 0);
+    throttleCenter = vec3 (engine.aspectRatio-throttleSize, -1+throttleSize, 0);
 }
 
 Hud::~Hud()
@@ -53,13 +51,13 @@ void Hud::handleTouch(Engine &engine, float x, float y)
         float dx = x * engine.aspectRatio - controllerCenter[0];
         float dy = y - controllerCenter[1];
 
-        engine.state.shipQuat = glm::normalize (glm::angleAxis(5*dx, glm::vec3(0, -1, 0))
+        engine.state.shipQuat = normalize (angleAxis(5*dx, vec3(0, -1, 0))
                                          * engine.state.shipQuat
-                                         * glm::angleAxis (5*dy, glm::vec3(-1, 0, 0)));
+                                         * angleAxis (5*dy, vec3(-1, 0, 0)));
 
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
-        engine.state.camRot += 0.1f*glm::vec2(dx, dy);
+        engine.state.camRot += 0.1f*vec2(dx, dy);
     } else if ((x * engine.aspectRatio > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
         engine.state.throttle = true;
@@ -82,22 +80,22 @@ void Hud::draw(Engine &engine)
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    modelMatrix = glm::translate (glm::mat4 (1), controllerCenter);
-    modelMatrix = glm::scale (modelMatrix, glm::vec3(controllerBgSize));
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr(engine.orthoMatrix * modelMatrix));
+    modelMatrix = translate (mat4 (1), controllerCenter);
+    modelMatrix = scale (modelMatrix, vec3(controllerBgSize));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr(engine.orthoMatrix * modelMatrix));
     glBindTexture (GL_TEXTURE_2D, controllerBgTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
 
-    modelMatrix = glm::translate (glm::mat4 (1), controllerCenter+controllerOffset);
-    modelMatrix = glm::scale (modelMatrix, glm::vec3(controllerSize));
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr(engine.orthoMatrix * modelMatrix));
+    modelMatrix = translate (mat4 (1), controllerCenter+controllerOffset);
+    modelMatrix = scale (modelMatrix, vec3(controllerSize));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr(engine.orthoMatrix * modelMatrix));
     glBindTexture (GL_TEXTURE_2D, controllerTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
     controllerOffset *= 0.8f;
 
-    modelMatrix = glm::translate (glm::mat4 (1), throttleCenter);
-    modelMatrix = glm::scale (modelMatrix, glm::vec3 (throttleSize));
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (engine.orthoMatrix * modelMatrix));
+    modelMatrix = translate (mat4 (1), throttleCenter);
+    modelMatrix = scale (modelMatrix, vec3 (throttleSize));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.orthoMatrix * modelMatrix));
     glBindTexture (GL_TEXTURE_2D, throttleTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
 

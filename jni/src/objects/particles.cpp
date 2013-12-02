@@ -1,16 +1,12 @@
 #include "particles.h"
-#include "util/assets.h"
-#include "util/shader.h"
 
-using namespace std;
-
-Particles::Particles(glm::vec3 color, GLuint maxParticles, GLfloat size, float decay)
+Particles::Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay)
     : maxCount (maxParticles), particlesColor (color), particleSize (size), decayFactor (decay)
 {
     components = 3 + 1;
     stride = components * sizeof (GLfloat);
-    particle dp = {glm::vec3 (0.1), glm::vec3 (0), 1000.0};
-    for (int i = 0; i < maxCount; i++) {
+    particle dp = {vec3 (0.1), vec3 (0), 1000.0};
+    for (int i = 0; i < maxCount; ++i) {
         particles.push_back (dp);
     }
     vertexData.reserve (maxCount * components);
@@ -41,9 +37,9 @@ Particles::~Particles()
 
 void Particles::draw(Engine &engine)
 {
-    for (auto iter = particles.begin (); iter != particles.end (); ++iter) {
-        iter->position += iter->velocity * (float)(engine.delta * 0.001);
-        iter->lifeTime += engine.delta * decayFactor;
+    for (auto &p : particles) {
+        p.position += p.velocity * (float)(engine.delta * 0.001);
+        p.lifeTime += engine.delta * decayFactor;
     }
     for (int i = 0; i < maxCount; ++i) {
         vertexData[i*components] = particles[i].position[0];
@@ -53,8 +49,8 @@ void Particles::draw(Engine &engine)
     }
 
     glUseProgram (program);
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (engine.projectionMatrix * engine.viewMatrix));
-    glUniform3fv (u_ColorHandle, 1, glm::value_ptr (particlesColor));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.projectionMatrix * engine.viewMatrix));
+    glUniform3fv (u_ColorHandle, 1, value_ptr (particlesColor));
     glUniform1f (u_SizeHandle, particleSize);
 
 //    glActiveTexture (GL_TEXTURE2);
@@ -75,13 +71,13 @@ void Particles::draw(Engine &engine)
     glDisable (GL_BLEND);
 }
 
-void Particles::addParticles(glm::vec3 position, glm::vec3 velocity, int count)
+void Particles::addParticles(vec3 position, vec3 velocity, int count)
 {
     for (int i = 0; i < count; ++i) {
-        if (cursor++ >= maxCount) cursor = 0;
+        if (++cursor >= maxCount) cursor = 0;
 
-        particles[cursor].position = position + glm::ballRand (0.01f);
-        particles[cursor].velocity = velocity + glm::ballRand (0.1f);
+        particles[cursor].position = position + ballRand (0.01f);
+        particles[cursor].velocity = velocity + ballRand (0.1f);
         particles[cursor].lifeTime = 0.0f;
     }
 }

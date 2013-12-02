@@ -17,7 +17,7 @@ Ship::Ship (Engine &engine) {
     vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
     stride = 3 * 3 * sizeof (GLfloat);
 
-    particles = unique_ptr<Particles> (new Particles (glm::vec3(1,0.5,0.1), 1024,
+    particles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
                                                       engine.width/12, 1/256.0));
 }
 
@@ -29,9 +29,9 @@ Ship::~Ship () {
 }
 
 void Ship::update (Engine &engine) {
-    glm::vec3 dv = engine.state.shipQuat * glm::vec3 (0, 0, 1);
-    glm::vec3 up = engine.state.shipQuat * glm::vec3 (0, 1, 0);
-    glm::vec3 rt = engine.state.shipQuat * glm::vec3 (1, 0, 0);
+    vec3 dv = engine.state.shipQuat * vec3 (0, 0, 1);
+    vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
+    vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
     if (engine.state.throttle) {
         engine.state.shipVel += dv * (float)(engine.delta / 200.0);
@@ -49,16 +49,16 @@ void Ship::update (Engine &engine) {
 void Ship::draw(Engine &engine) {
     glUseProgram (program);
 
-    modelMatrix = glm::translate (glm::mat4(1), engine.state.shipPos)
-            * glm::mat4_cast(engine.state.shipQuat);
+    modelMatrix = translate (mat4(1), engine.state.shipPos)
+            * mat4_cast(engine.state.shipQuat);
 
     mvMatrix = engine.viewMatrix * modelMatrix;
     mvpMatrix = engine.projectionMatrix * mvMatrix;
 
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, glm::value_ptr (mvpMatrix));
-    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, glm::value_ptr (mvMatrix));
-    glUniform3fv (u_LightPosHandle, 1, glm::value_ptr (engine.viewMatrix * engine.state.lightPos));
-    glUniform3fv (u_EyePosHandle, 1, glm::value_ptr (engine.state.eyePos));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvpMatrix));
+    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mvMatrix));
+    glUniform3fv (u_LightPosHandle, 1, value_ptr (engine.viewMatrix * engine.state.lightPos));
+    glUniform3fv (u_EyePosHandle, 1, value_ptr (engine.state.eyePos));
 
     glBindBuffer (GL_ARRAY_BUFFER, vbo);
 

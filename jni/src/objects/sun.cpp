@@ -1,8 +1,6 @@
 #include "sun.h"
-#include "util/assets.h"
-#include "util/shader.h"
 
-Sun::Sun(glm::vec3 sunPosition, float sunSize)
+Sun::Sun(vec3 sunPosition, float sunSize)
     : position (sunPosition), size (sunSize)
 {
     program = buildProgramFromAssets ("shaders/sun.vsh", "shaders/sun.fsh");
@@ -28,14 +26,14 @@ void Sun::draw(Engine &engine)
 {
     glUseProgram (program);
     glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE,
-                        glm::value_ptr (engine.projectionMatrix * engine.viewMatrix));
+                        value_ptr (engine.projectionMatrix * engine.viewMatrix));
     glUniform1f (u_SizeHandle, size);
 
     glActiveTexture (GL_TEXTURE3);
     glBindTexture (GL_TEXTURE_2D, sunTex);
     glUniform1i (u_TexUnitHandle, 3);
 
-    glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, 0, glm::value_ptr (position));
+    glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, 0, value_ptr (position));
     glEnableVertexAttribArray (a_PositionHandle);
 
     glEnable (GL_BLEND);
