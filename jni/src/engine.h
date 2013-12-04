@@ -11,6 +11,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/random.hpp>
 #include <glm/gtc/noise.hpp>
+#include <glm/gtx/intersect.hpp>
 
 #include <vector>
 #include <map>
@@ -26,6 +27,7 @@ using glm::vec2;
 using glm::vec3;
 using glm::vec4;
 using glm::uvec3;
+using glm::length;
 using glm::normalize;
 using glm::cross;
 using glm::dot;
@@ -60,6 +62,7 @@ struct saved_state {
     vec3 shipVel;
     quat shipQuat;
     bool throttle;
+    bool fire;
 };
 
 typedef struct {

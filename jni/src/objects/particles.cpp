@@ -5,7 +5,7 @@ Particles::Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay)
 {
     components = 3 + 1;
     stride = components * sizeof (GLfloat);
-    particle dp = {vec3 (0.1), vec3 (0), 1000.0};
+    particle dp = {vec3 (1000), vec3 (0), 1000.0};
     for (int i = 0; i < maxCount; ++i) {
         particles.push_back (dp);
     }
@@ -85,4 +85,9 @@ void Particles::addParticles(vec3 position, vec3 velocity, int count)
 void Particles::setParticlesColor(const vec3 &value)
 {
     particlesColor = value;
+}
+
+vector<particle>& Particles::getParticles()
+{
+    return particles;
 }

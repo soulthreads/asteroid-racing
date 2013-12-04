@@ -17,8 +17,10 @@ Ship::Ship (Engine &engine) {
     vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
     stride = 3 * 3 * sizeof (GLfloat);
 
-    particles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
-                                                      engine.width/12, 1/256.0));
+    throttleParticles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
+                                                      engine.width/12.0, 1/256.0));
+    fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 256,
+                                                          engine.width/4.0, 1/2048.0));
     throttleTime = 0;
 }
 
@@ -29,26 +31,49 @@ Ship::~Ship () {
     }
 }
 
-void Ship::update (Engine &engine) {
+void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
     vec3 dv = engine.state.shipQuat * vec3 (0, 0, 1);
     vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
     vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
     if (engine.state.throttle) {
-        engine.state.shipVel += dv * (float)(engine.delta / 200.0);
-        particles->addParticles (engine.state.shipPos-0.4f*dv,
+        engine.state.shipVel += dv * (float)(engine.delta / 100.0);
+        throttleParticles->addParticles (engine.state.shipPos-0.4f*dv,
                                  engine.state.shipVel-2.0f*dv, 2);
-        particles->addParticles (engine.state.shipPos-0.4f*dv-0.08f*up+0.22f*rt,
+        throttleParticles->addParticles (engine.state.shipPos-0.4f*dv-0.06f*up+0.22f*rt,
                                  engine.state.shipVel-2.0f*dv, 2);
-        particles->addParticles (engine.state.shipPos-0.4f*dv-0.08f*up-0.22f*rt,
+        throttleParticles->addParticles (engine.state.shipPos-0.4f*dv-0.06f*up-0.22f*rt,
                                  engine.state.shipVel-2.0f*dv, 2);
         throttleTime += engine.delta * 0.0001;
     } else {
         throttleTime *= 0.98;
     }
-    particles->setParticlesColor (mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
+    throttleParticles->setParticlesColor (mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
+
+    if (engine.state.fire) {
+        fireParticles->addParticles (engine.state.shipPos+0.12f*up+0.2f*rt,
+                                     engine.state.shipVel+80.f*dv, 1);
+        fireParticles->addParticles (engine.state.shipPos+0.12f*up-0.2f*rt,
+                                     engine.state.shipVel+80.f*dv, 1);
+    }
 
     engine.state.shipPos += engine.state.shipVel * (float)(engine.delta * 0.001);
+
+    for (auto &p : fireParticles->getParticles ()) {
+        if (p.lifeTime < 10) {
+            for (auto &a : asteroids) {
+                vec3 ip1, in1, ip2, in2;
+                auto i = glm::intersectLineSphere (p.position-p.velocity, p.position,
+                                                              a.position, a.radius,
+                                                              ip1, in1, ip2, in2);
+                if (i && (length(ip1-p.position) < length (p.velocity)/2.0)) {
+                    a.stamina -= 1;
+                    if (a.stamina == 0) a.blownUp = true;
+                    p.lifeTime = 1000;
+                }
+            }
+        }
+    }
 }
 
 void Ship::draw(Engine &engine) {
@@ -82,5 +107,6 @@ void Ship::draw(Engine &engine) {
 
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
-    particles->draw (engine);
+    throttleParticles->draw (engine);
+    fireParticles->draw (engine);
 }

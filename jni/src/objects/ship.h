@@ -3,6 +3,7 @@
 
 #include "engine.h"
 #include "particles.h"
+#include "asteroids.h"
 
 class Ship
 {
@@ -22,7 +23,8 @@ private:
 
     mat4 modelMatrix, mvMatrix, mvpMatrix;
 
-    unique_ptr<Particles> particles;
+    unique_ptr<Particles> throttleParticles;
+    unique_ptr<Particles> fireParticles;
     float throttleTime;
 
 public:
@@ -30,7 +32,7 @@ public:
     ~Ship ();
 
     void draw (Engine &engine);
-    void update(Engine &engine);
+    void update(Engine &engine, vector<asteroid> &asteroids);
 };
 
 #endif // SHIP_H

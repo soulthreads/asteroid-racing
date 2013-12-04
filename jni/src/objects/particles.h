@@ -3,6 +3,12 @@
 
 #include "engine.h"
 
+typedef struct {
+    vec3 position;
+    vec3 velocity;
+    float lifeTime;
+} particle;
+
 class Particles
 {
 private:
@@ -21,11 +27,6 @@ private:
 
     vec3 particlesColor;
     GLuint maxCount;
-    typedef struct {
-        vec3 position;
-        vec3 velocity;
-        float lifeTime;
-    } particle;
 
     vector<particle> particles;
     vector<GLfloat> vertexData;
@@ -39,6 +40,7 @@ public:
     void draw (Engine &engine);
     void addParticles (vec3 position, vec3 velocity, int count);
     void setParticlesColor(const vec3 &value);
+    vector<particle> &getParticles();
 };
 
 #endif // PARTICLES_H

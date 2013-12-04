@@ -2,6 +2,18 @@
 #define ASTEROID_H
 
 #include "engine.h"
+#include "particles.h"
+
+typedef struct {
+    GLuint vbo;
+    vec3 position;
+    vec3 velocity;
+    quat orientation;
+    quat rot;
+    float radius;
+    short stamina;
+    bool blownUp;
+} asteroid;
 
 class Asteroids
 {
@@ -14,17 +26,9 @@ private:
     GLuint a_PositionHandle;
     GLuint a_NormalHandle;
 
-    typedef struct {
-        GLuint vbo;
-        vec3 position;
-        vec3 velocity;
-        quat orientation;
-        quat rot;
-        float radius;
-    } asteroid;
-
     GLuint ibo;
     vector <asteroid> asteroids;
+    unique_ptr<Particles> explosion;
 
     vector<vec3> icoVertices;
     vector<uvec3> icoIndexes;
@@ -34,9 +38,10 @@ private:
     GLushort getMiddlePoint(GLushort p1, GLushort p2);
 
 public:
-    Asteroids ();
+    Asteroids (Engine &engine);
     ~Asteroids ();
     void draw (Engine &engine);
+    vector<asteroid> &getAsteroids();
 };
 
 #endif // ASTEROID_H

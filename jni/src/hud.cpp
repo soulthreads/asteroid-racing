@@ -26,9 +26,11 @@ Hud::Hud(Engine &engine)
     controllerTex = loadTextureFromAsset ("textures/controller.png");
     controllerBgTex = loadTextureFromAsset ("textures/controller_bg.png");
     throttleTex = loadTextureFromAsset ("textures/throttle.png");
+    fireTex = loadTextureFromAsset ("textures/fire.png");
 
     controllerCenter = vec3 (-engine.aspectRatio+controllerBgSize, -1+controllerBgSize, 0);
     throttleCenter = vec3 (engine.aspectRatio-throttleSize, -1+throttleSize, 0);
+    fireCenter = vec3 (engine.aspectRatio-2*throttleSize-fireSize, -1+fireSize, 0);
 }
 
 Hud::~Hud()
@@ -46,9 +48,10 @@ Hud::~Hud()
 
 void Hud::handleTouch(Engine &engine, float x, float y)
 {
-    if ((x * engine.aspectRatio < controllerCenter[0]+controllerBgSize)
+    float wx = x * engine.aspectRatio;
+    if ((wx < controllerCenter[0]+controllerBgSize)
             && (y < controllerCenter[1] + controllerBgSize)) {
-        float dx = x * engine.aspectRatio - controllerCenter[0];
+        float dx = wx - controllerCenter[0];
         float dy = y - controllerCenter[1];
 
         vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
@@ -59,10 +62,12 @@ void Hud::handleTouch(Engine &engine, float x, float y)
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
         engine.state.camRot += 0.1f*vec2(dx, dy);
-    } else if ((x * engine.aspectRatio > throttleCenter[0] - throttleSize)
+    } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
         engine.state.throttle = true;
-    } else {
+    } else if ((wx > fireCenter[0] - fireSize)
+               && (y < fireCenter[1] + fireSize)) {
+        engine.state.fire = true;
     }
 }
 
@@ -98,6 +103,12 @@ void Hud::draw(Engine &engine)
     modelMatrix = scale (modelMatrix, vec3 (throttleSize));
     glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.orthoMatrix * modelMatrix));
     glBindTexture (GL_TEXTURE_2D, throttleTex);
+    glDrawArrays (GL_TRIANGLES, 0, 6);
+
+    modelMatrix = translate (mat4 (1), fireCenter);
+    modelMatrix = scale (modelMatrix, vec3 (fireSize));
+    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.orthoMatrix * modelMatrix));
+    glBindTexture (GL_TEXTURE_2D, fireTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
 
     glDisable (GL_BLEND);

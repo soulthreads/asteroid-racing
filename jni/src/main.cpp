@@ -86,7 +86,7 @@ static int engineInitDisplay (Engine &engine) {
     glEnable (GL_CULL_FACE);
     glEnable (GL_DEPTH_TEST);
 
-    engine.projectionMatrix = perspective (60.0f, ((float)w)/h, 0.1f, 1000.0f);
+    engine.projectionMatrix = perspective (60.0f, ((float)w)/h, 0.1f, 2000.0f);
     engine.orthoMatrix = ortho (-(engine.aspectRatio), +engine.aspectRatio,
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
@@ -95,7 +95,7 @@ static int engineInitDisplay (Engine &engine) {
     skybox = unique_ptr<Skybox>(new Skybox (engine));
     ship = unique_ptr<Ship> (new Ship (engine));
     envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/4, 1/1024.0));
-    ast = unique_ptr<Asteroids> (new Asteroids);
+    ast = unique_ptr<Asteroids> (new Asteroids (engine));
 
     return 0;
 }
@@ -120,15 +120,15 @@ static void engineDrawFrame (Engine &engine) {
     vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
     vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
-    vec3 offset = engine.state.camRot[0] * rt - engine.state.camRot[1] * up + 2.0f * dv;
+    vec3 offset = engine.state.camRot[0] * rt - (1 + engine.state.camRot[1]) * up + 2.0f * dv;
     engine.state.camRot *= 0.95f;
 
     engine.viewMatrix = lookAt (vec3 (0), offset, up);
     skybox->draw (engine);
 
-    ship->update (engine);
+    ship->update (engine, ast->getAsteroids ());
     engine.state.eyePos = engine.state.shipPos - offset;
-    engine.viewMatrix = lookAt (engine.state.eyePos, engine.state.shipPos, up);
+    engine.viewMatrix = lookAt (engine.state.eyePos, engine.state.shipPos+dv, up);
 
     ast->draw (engine);
 
@@ -185,6 +185,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                 >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
         engine.state.throttle = false;
+        engine.state.fire = false;
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
             for (size_t i = 0; i < count; ++i) {
                 if (!(actionIndex == i

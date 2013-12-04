@@ -87,7 +87,7 @@ GLushort Asteroids::getMiddlePoint(GLushort p1, GLushort p2)
     return index++;
 }
 
-Asteroids::Asteroids()
+Asteroids::Asteroids(Engine &engine)
 {
     program = buildProgramFromAssets ("shaders/asteroid.vsh", "shaders/asteroid.fsh");
     validateProgram (program);
@@ -112,7 +112,7 @@ Asteroids::Asteroids()
     glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    for (int i = 0; i < 50; ++i) {
+    for (int i = 0; i < 10; ++i) {
         vector<vec3> tmpVertices = icoVertices;
         for (auto &v : tmpVertices) {
             v += (0.25f*simplex((vec3(i)+v))
@@ -136,13 +136,17 @@ Asteroids::Asteroids()
         glBindBuffer (GL_ARRAY_BUFFER, 0);
 
         asteroids.push_back (asteroid {vbo,
-                                       sphericalRand (10.f)+ballRand (1000.f),
-                                       ballRand (10.f),
+                                       sphericalRand (10.f)+ballRand (200.f),
+                                       ballRand (1.f),
                                        angleAxis(0.f, ballRand (1.f)),
                                        angleAxis(linearRand (0.f, 1.f), ballRand (1.f)),
-                                       linearRand(1.f, 25.f)});
+                                       linearRand(1.f, 25.f),
+                                       10, false});
     }
     // TODO: add bump mapping
+
+    explosion = unique_ptr<Particles> (new Particles (vec3 (1, 0.5, 0.1), 512,
+                                                      engine.width/2.0, 1/1024.0));
 }
 
 Asteroids::~Asteroids ()
@@ -167,7 +171,20 @@ void Asteroids::draw(Engine &engine)
     int size;
     glGetBufferParameteriv (GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
+    for (auto it = asteroids.begin (); it != asteroids.end ();) {
+        if (it->blownUp) {
+            for (int i = 0; i < 500; i++)
+                explosion->addParticles (it->position+sphericalRand(it->radius),
+                                         sphericalRand (20.0f) + ballRand (20.0f), 1);
+            glDeleteBuffers (1, &it->vbo);
+            it = asteroids.erase (it);
+        } else {
+            ++it;
+        }
+    }
+
     for (auto &a : asteroids) {
+        if (a.blownUp) continue;
         a.position += a.velocity * float(engine.delta * 0.001);
         a.orientation = normalize (a.orientation * a.rot);
         mat4 mv = engine.viewMatrix
@@ -192,4 +209,11 @@ void Asteroids::draw(Engine &engine)
 
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer (GL_ARRAY_BUFFER, 0);
+
+    explosion->draw (engine);
+}
+
+vector<asteroid> &Asteroids::getAsteroids()
+{
+    return asteroids;
 }
