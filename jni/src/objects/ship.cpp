@@ -46,7 +46,7 @@ void Ship::update (Engine &engine) {
     } else {
         throttleTime *= 0.98;
     }
-    particles->setParticlesColor (glm::mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
+    particles->setParticlesColor (mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
 
     engine.state.shipPos += engine.state.shipVel * (float)(engine.delta * 0.001);
 }

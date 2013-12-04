@@ -15,7 +15,7 @@ private:
     GLuint a_NormalHandle;
 
     typedef struct {
-        GLuint vbo, ibo;
+        GLuint vbo;
         vec3 position;
         vec3 velocity;
         quat orientation;
@@ -23,7 +23,7 @@ private:
         float radius;
     } asteroid;
 
-    GLuint vbo, ibo;
+    GLuint ibo;
     vector <asteroid> asteroids;
 
     vector<vec3> icoVertices;

@@ -100,17 +100,6 @@ Asteroids::Asteroids()
 
     createIcosphere (3);
 
-    for (auto &v : icoVertices) {
-        v += (0.2f*simplex(v)+0.1f*simplex(v*2.f) + 0.05f*simplex (v*4.f)) * v;
-    }
-
-    vector<GLfloat> vertexData;
-    for (auto &v : icoVertices) {
-        vertexData.push_back (v[0]);
-        vertexData.push_back (v[1]);
-        vertexData.push_back (v[2]);
-    }
-
     vector<GLushort> indexData;
     for (auto &i : icoIndexes) {
         indexData.push_back (i[0]);
@@ -118,26 +107,51 @@ Asteroids::Asteroids()
         indexData.push_back (i[2]);
     }
 
-    glGenBuffers (1, &vbo);
-    glBindBuffer (GL_ARRAY_BUFFER, vbo);
-    glBufferData (GL_ARRAY_BUFFER, vertexData.size () * sizeof (GLfloat), vertexData.data (), GL_STATIC_DRAW);
-
     glGenBuffers (1, &ibo);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLfloat), indexData.data (), GL_STATIC_DRAW);
-
-    glBindBuffer (GL_ARRAY_BUFFER, 0);
+    glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
+    for (int i = 0; i < 50; ++i) {
+        vector<vec3> tmpVertices = icoVertices;
+        for (auto &v : tmpVertices) {
+            v += (0.25f*simplex((vec3(i)+v))
+                  + 0.125f*simplex((vec3(i)+v)*2.f)
+                  + 0.0625f*simplex ((vec3(i)+v)*4.f)
+                  + 0.03125f*simplex ((vec3(i)+v)*8.f)) * v;
+        }
+
+        vector<GLfloat> vertexData;
+        for (auto &v : tmpVertices) {
+            vertexData.push_back (v[0]);
+            vertexData.push_back (v[1]);
+            vertexData.push_back (v[2]);
+        }
+
+        GLuint vbo;
+        glGenBuffers (1, &vbo);
+        glBindBuffer (GL_ARRAY_BUFFER, vbo);
+        glBufferData (GL_ARRAY_BUFFER, vertexData.size () * sizeof (GLfloat), vertexData.data (), GL_STATIC_DRAW);
+
+        glBindBuffer (GL_ARRAY_BUFFER, 0);
+
+        asteroids.push_back (asteroid {vbo,
+                                       sphericalRand (10.f)+ballRand (1000.f),
+                                       ballRand (10.f),
+                                       angleAxis(0.f, ballRand (1.f)),
+                                       angleAxis(linearRand (0.f, 1.f), ballRand (1.f)),
+                                       linearRand(1.f, 25.f)});
+    }
     // TODO: add bump mapping
 }
 
 Asteroids::~Asteroids ()
 {
-    if (vbo) {
-        glDeleteBuffers (1, &vbo);
-        vbo = 0;
-    }
+    for (auto &a : asteroids)
+        if (a.vbo) {
+            glDeleteBuffers (1, &a.vbo);
+            a.vbo = 0;
+        }
 
     if (ibo) {
         glDeleteBuffers (1, &ibo);
@@ -149,24 +163,32 @@ void Asteroids::draw(Engine &engine)
 {
     glUseProgram (program);
 
-    mat4 mv = engine.viewMatrix * translate (scale(mat4 (1), vec3(2)), vec3 (0, 0, 5));
-    mat4 mvp = engine.projectionMatrix * mv;
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
-    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mv));
-    glUniform3fv (u_LightPosHandle, 1, value_ptr (engine.viewMatrix * engine.state.lightPos));
-
-    glBindBuffer (GL_ARRAY_BUFFER, vbo);
-
-    glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray (a_PositionHandle);
-
-    glVertexAttribPointer (a_NormalHandle, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray (a_NormalHandle);
-
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
     int size;
     glGetBufferParameteriv (GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements (GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+
+    for (auto &a : asteroids) {
+        a.position += a.velocity * float(engine.delta * 0.001);
+        a.orientation = normalize (a.orientation * a.rot);
+        mat4 mv = engine.viewMatrix
+                * translate (mat4(1), a.position)
+                * scale(mat4 (1), vec3(a.radius))
+                * mat4_cast (a.orientation);
+        mat4 mvp = engine.projectionMatrix * mv;
+        glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
+        glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mv));
+        glUniform3fv (u_LightPosHandle, 1, value_ptr (engine.viewMatrix * engine.state.lightPos));
+
+        glBindBuffer (GL_ARRAY_BUFFER, a.vbo);
+
+        glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray (a_PositionHandle);
+
+        glVertexAttribPointer (a_NormalHandle, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray (a_NormalHandle);
+
+        glDrawElements (GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
+    }
 
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer (GL_ARRAY_BUFFER, 0);

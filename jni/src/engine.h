@@ -29,6 +29,9 @@ using glm::uvec3;
 using glm::normalize;
 using glm::cross;
 using glm::dot;
+using glm::mix;
+
+using glm::linearRand;
 using glm::ballRand;
 using glm::sphericalRand;
 
