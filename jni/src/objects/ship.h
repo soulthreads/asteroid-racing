@@ -23,6 +23,7 @@ private:
     mat4 modelMatrix, mvMatrix, mvpMatrix;
 
     unique_ptr<Particles> particles;
+    float throttleTime;
 
 public:
     Ship (Engine &engine);

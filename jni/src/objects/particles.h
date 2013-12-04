@@ -38,6 +38,7 @@ public:
     ~Particles();
     void draw (Engine &engine);
     void addParticles (vec3 position, vec3 velocity, int count);
+    void setParticlesColor(const vec3 &value);
 };
 
 #endif // PARTICLES_H

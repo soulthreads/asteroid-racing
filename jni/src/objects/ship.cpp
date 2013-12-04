@@ -19,6 +19,7 @@ Ship::Ship (Engine &engine) {
 
     particles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
                                                       engine.width/12, 1/256.0));
+    throttleTime = 0;
 }
 
 Ship::~Ship () {
@@ -41,7 +42,11 @@ void Ship::update (Engine &engine) {
                                  engine.state.shipVel-2.0f*dv, 2);
         particles->addParticles (engine.state.shipPos-0.4f*dv-0.08f*up-0.22f*rt,
                                  engine.state.shipVel-2.0f*dv, 2);
+        throttleTime += engine.delta * 0.0001;
+    } else {
+        throttleTime *= 0.98;
     }
+    particles->setParticlesColor (glm::mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
 
     engine.state.shipPos += engine.state.shipVel * (float)(engine.delta * 0.001);
 }
@@ -77,6 +82,5 @@ void Ship::draw(Engine &engine) {
 
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
-    // TODO: mix colors depending on speed
     particles->draw (engine);
 }

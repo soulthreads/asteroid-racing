@@ -81,3 +81,8 @@ void Particles::addParticles(vec3 position, vec3 velocity, int count)
         particles[cursor].lifeTime = 0.0f;
     }
 }
+
+void Particles::setParticlesColor(const vec3 &value)
+{
+    particlesColor = value;
+}
