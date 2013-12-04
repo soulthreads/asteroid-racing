@@ -11,7 +11,7 @@ typedef struct {
     quat orientation;
     quat rot;
     float radius;
-    short stamina;
+    float stamina;
     bool blownUp;
 } asteroid;
 
@@ -22,6 +22,8 @@ private:
     GLuint u_MvpMatrixHandle;
     GLuint u_MvMatrixHandle;
     GLuint u_LightPosHandle;
+    GLuint u_ColorHandle;
+    GLuint u_Color2Handle;
 
     GLuint a_PositionHandle;
     GLuint a_NormalHandle;

@@ -19,7 +19,7 @@ Ship::Ship (Engine &engine) {
 
     throttleParticles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
                                                       engine.width/16.0, 1/256.0));
-    fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 256,
+    fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 512,
                                                           engine.width/16.0, 1/1024.0));
     throttleTime = 0;
 }
@@ -68,8 +68,8 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
         if (p.lifeTime < 10) {
             for (auto &a : asteroids) {
                 if (length(a.position-p.position) <= length(p.velocity*dt)+a.radius) {
-                    a.stamina -= 1;
-                    if (a.stamina == 0) a.blownUp = true;
+                    a.stamina -= 0.2/a.radius;
+                    if (a.stamina <= 0) a.blownUp = true;
                     p.lifeTime = 1000;
                 }
             }

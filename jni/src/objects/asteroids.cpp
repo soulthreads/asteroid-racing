@@ -94,6 +94,8 @@ Asteroids::Asteroids(Engine &engine)
     u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
     u_MvMatrixHandle = glGetUniformLocation (program, "u_MvMatrix");
     u_LightPosHandle = glGetUniformLocation (program, "u_LightPos");
+    u_ColorHandle = glGetUniformLocation (program, "u_Color");
+    u_Color2Handle = glGetUniformLocation (program, "u_Color2");
 
     a_PositionHandle = glGetAttribLocation (program, "a_Position");
     a_NormalHandle = glGetAttribLocation (program, "a_Normal");
@@ -112,7 +114,7 @@ Asteroids::Asteroids(Engine &engine)
     glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
         vector<vec3> tmpVertices = icoVertices;
         for (auto &v : tmpVertices) {
             v += (0.25f*simplex((vec3(i)+v))
@@ -135,13 +137,13 @@ Asteroids::Asteroids(Engine &engine)
 
         glBindBuffer (GL_ARRAY_BUFFER, 0);
 
+        float radius = linearRand (2.f, 32.f);
         asteroids.push_back (asteroid {vbo,
-                                       sphericalRand (10.f)+ballRand (200.f),
+                                       sphericalRand (10.f)+ballRand (500.f),
                                        ballRand (1.f),
                                        angleAxis(0.f, ballRand (1.f)),
                                        angleAxis(linearRand (0.f, 1.f), ballRand (1.f)),
-                                       linearRand(1.f, 25.f),
-                                       10, false});
+                                       radius, 1.0, false});
     }
     // TODO: add bump mapping
 
@@ -195,6 +197,12 @@ void Asteroids::draw(Engine &engine)
         glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvp));
         glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mv));
         glUniform3fv (u_LightPosHandle, 1, value_ptr (engine.viewMatrix * engine.state.lightPos));
+
+        glUniform3fv (u_ColorHandle, 1,
+                      value_ptr (mix(vec3(1.0, 0.1, 0.1), vec3 (0.9, 0.7, 0.5), a.stamina)));
+        glUniform3fv (u_Color2Handle, 1,
+                      value_ptr (mix(vec3(1.0, 0.5, 0.3), vec3 (0.1, 0.05, 0.05), a.stamina)));
+
 
         glBindBuffer (GL_ARRAY_BUFFER, a.vbo);
 
