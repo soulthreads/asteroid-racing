@@ -145,7 +145,7 @@ Asteroids::Asteroids(Engine &engine)
     }
     // TODO: add bump mapping
 
-    explosion = unique_ptr<Particles> (new Particles (vec3 (1, 0.5, 0.1), 512,
+    explosion = unique_ptr<Particles> (new Particles (vec3 (1, 0.5, 0.1), 1024,
                                                       engine.width/2.0, 1/1024.0));
 }
 
@@ -173,7 +173,7 @@ void Asteroids::draw(Engine &engine)
 
     for (auto it = asteroids.begin (); it != asteroids.end ();) {
         if (it->blownUp) {
-            for (int i = 0; i < 500; i++)
+            for (int i = 0; i < 1024; i++)
                 explosion->addParticles (it->position+sphericalRand(it->radius),
                                          sphericalRand (20.0f) + ballRand (20.0f), 1);
             glDeleteBuffers (1, &it->vbo);

@@ -36,15 +36,17 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
     vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
     vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
+    float dt = engine.delta * 0.001;
+
     if (engine.state.throttle) {
-        engine.state.shipVel += dv * (float)(engine.delta / 100.0);
+        engine.state.shipVel += dv * dt * 10.0f;
         throttleParticles->addParticles (engine.state.shipPos-0.4f*dv,
                                  engine.state.shipVel-2.0f*dv, 2);
         throttleParticles->addParticles (engine.state.shipPos-0.4f*dv-0.06f*up+0.22f*rt,
                                  engine.state.shipVel-2.0f*dv, 2);
         throttleParticles->addParticles (engine.state.shipPos-0.4f*dv-0.06f*up-0.22f*rt,
                                  engine.state.shipVel-2.0f*dv, 2);
-        throttleTime += engine.delta * 0.0001;
+        throttleTime += dt * 0.1f;
     } else {
         throttleTime *= 0.98;
     }
@@ -57,16 +59,12 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
                                      engine.state.shipVel+80.f*dv, 1);
     }
 
-    engine.state.shipPos += engine.state.shipVel * (float)(engine.delta * 0.001);
+    engine.state.shipPos += engine.state.shipVel * dt;
 
     for (auto &p : fireParticles->getParticles ()) {
         if (p.lifeTime < 10) {
             for (auto &a : asteroids) {
-                vec3 ip1, in1, ip2, in2;
-                auto i = glm::intersectLineSphere (p.position-p.velocity, p.position,
-                                                              a.position, a.radius,
-                                                              ip1, in1, ip2, in2);
-                if (i && (length(ip1-p.position) < length (p.velocity)/2.0)) {
+                if (length(a.position-p.position) <= length(p.velocity*dt)+a.radius) {
                     a.stamina -= 1;
                     if (a.stamina == 0) a.blownUp = true;
                     p.lifeTime = 1000;

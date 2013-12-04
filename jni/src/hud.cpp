@@ -30,7 +30,7 @@ Hud::Hud(Engine &engine)
 
     controllerCenter = vec3 (-engine.aspectRatio+controllerBgSize, -1+controllerBgSize, 0);
     throttleCenter = vec3 (engine.aspectRatio-throttleSize, -1+throttleSize, 0);
-    fireCenter = vec3 (engine.aspectRatio-2*throttleSize-fireSize, -1+fireSize, 0);
+    fireCenter = vec3 (engine.aspectRatio-fireSize, -1+2.f*throttleSize+fireSize, 0);
 }
 
 Hud::~Hud()
