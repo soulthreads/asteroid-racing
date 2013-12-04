@@ -33,6 +33,7 @@ using glm::cross;
 using glm::dot;
 using glm::mix;
 
+using glm::clamp;
 using glm::linearRand;
 using glm::ballRand;
 using glm::sphericalRand;
@@ -63,6 +64,7 @@ struct saved_state {
     quat shipQuat;
     bool throttle;
     bool fire;
+    bool rotating;
 };
 
 typedef struct {

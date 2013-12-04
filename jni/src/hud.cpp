@@ -51,6 +51,7 @@ void Hud::handleTouch(Engine &engine, float x, float y)
     float wx = x * engine.aspectRatio;
     if ((wx < controllerCenter[0]+controllerBgSize)
             && (y < controllerCenter[1] + controllerBgSize)) {
+        engine.state.rotating = true;
         float dx = wx - controllerCenter[0];
         float dy = y - controllerCenter[1];
 
@@ -61,7 +62,8 @@ void Hud::handleTouch(Engine &engine, float x, float y)
 
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
-        engine.state.camRot += 0.1f*vec2(dx, dy);
+        engine.state.camRot = clamp (engine.state.camRot + 0.05f*vec2(dx, dy),
+                                     vec2(-0.5,-0.5), vec2(0.5, 0.5));
     } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
         engine.state.throttle = true;

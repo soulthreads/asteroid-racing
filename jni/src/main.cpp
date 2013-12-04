@@ -121,7 +121,7 @@ static void engineDrawFrame (Engine &engine) {
     vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
 
     vec3 offset = engine.state.camRot[0] * rt - (1 + engine.state.camRot[1]) * up + 2.0f * dv;
-    engine.state.camRot *= 0.95f;
+    if (!engine.state.rotating) engine.state.camRot *= 0.95f;
 
     engine.viewMatrix = lookAt (vec3 (0), offset, up);
     skybox->draw (engine);
@@ -186,6 +186,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
 
         engine.state.throttle = false;
         engine.state.fire = false;
+        engine.state.rotating = false;
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
             for (size_t i = 0; i < count; ++i) {
                 if (!(actionIndex == i

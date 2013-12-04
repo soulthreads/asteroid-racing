@@ -173,9 +173,9 @@ void Asteroids::draw(Engine &engine)
 
     for (auto it = asteroids.begin (); it != asteroids.end ();) {
         if (it->blownUp) {
-            for (int i = 0; i < particlesCount; i++)
+            for (int i = 0; i < particlesCount/2; i++)
                 explosion->addParticles (it->position+sphericalRand(it->radius),
-                                         sphericalRand (20.0f) + ballRand (60.0f), 1);
+                                         sphericalRand (60.0f) + ballRand (40.0f), 1);
             glDeleteBuffers (1, &it->vbo);
             it = asteroids.erase (it);
         } else {
