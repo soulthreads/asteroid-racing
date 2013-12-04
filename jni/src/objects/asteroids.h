@@ -29,6 +29,7 @@ private:
     GLuint ibo;
     vector <asteroid> asteroids;
     unique_ptr<Particles> explosion;
+    static const size_t particlesCount = 512;
 
     vector<vec3> icoVertices;
     vector<uvec3> icoIndexes;

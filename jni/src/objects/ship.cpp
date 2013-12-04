@@ -18,9 +18,9 @@ Ship::Ship (Engine &engine) {
     stride = 3 * 3 * sizeof (GLfloat);
 
     throttleParticles = unique_ptr<Particles> (new Particles (vec3(1,0.5,0.1), 1024,
-                                                      engine.width/12.0, 1/256.0));
+                                                      engine.width/16.0, 1/256.0));
     fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 256,
-                                                          engine.width/4.0, 1/2048.0));
+                                                          engine.width/16.0, 1/1024.0));
     throttleTime = 0;
 }
 
@@ -38,8 +38,11 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
 
     float dt = engine.delta * 0.001;
 
+    float speedFactor = length (engine.state.shipVel) > 0 ?
+                (3.0-dot (normalize (engine.state.shipVel), normalize (dv))) / 2.0 : 1.0;
+
     if (engine.state.throttle) {
-        engine.state.shipVel += dv * dt * 10.0f;
+        engine.state.shipVel += dv * dt * speedFactor * 10.f;
         throttleParticles->addParticles (engine.state.shipPos-0.4f*dv,
                                  engine.state.shipVel-2.0f*dv, 2);
         throttleParticles->addParticles (engine.state.shipPos-0.4f*dv-0.06f*up+0.22f*rt,
@@ -53,10 +56,10 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
     throttleParticles->setParticlesColor (mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
 
     if (engine.state.fire) {
-        fireParticles->addParticles (engine.state.shipPos+0.12f*up+0.2f*rt,
-                                     engine.state.shipVel+80.f*dv, 1);
-        fireParticles->addParticles (engine.state.shipPos+0.12f*up-0.2f*rt,
-                                     engine.state.shipVel+80.f*dv, 1);
+        fireParticles->addParticles (engine.state.shipPos + 0.12f*up + 0.2f*rt,
+                                     engine.state.shipVel + speedFactor * 100.f*dv, 1);
+        fireParticles->addParticles (engine.state.shipPos + 0.12f*up - 0.2f*rt,
+                                     engine.state.shipVel + speedFactor * 100.f*dv, 1);
     }
 
     engine.state.shipPos += engine.state.shipVel * dt;

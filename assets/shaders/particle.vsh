@@ -10,5 +10,5 @@ void main(void)
 {
     gl_Position = u_MvpMatrix * a_Position;
     v_LifeTime = a_LifeTime;
-    gl_PointSize = u_Size / abs(0.5+gl_Position.w);
+    gl_PointSize = u_Size * 2.0 / abs(1.0+sqrt(gl_Position.w));
 }

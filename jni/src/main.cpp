@@ -94,7 +94,7 @@ static int engineInitDisplay (Engine &engine) {
 
     skybox = unique_ptr<Skybox>(new Skybox (engine));
     ship = unique_ptr<Ship> (new Ship (engine));
-    envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/4, 1/1024.0));
+    envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
     ast = unique_ptr<Asteroids> (new Asteroids (engine));
 
     return 0;
