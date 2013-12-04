@@ -57,7 +57,9 @@ void Ship::draw(Engine &engine) {
 
     glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvpMatrix));
     glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mvMatrix));
-    glUniform3fv (u_LightPosHandle, 1, value_ptr (engine.viewMatrix * engine.state.lightPos));
+
+    mat4 lightMatrix = engine.viewMatrix * translate (mat4(1), engine.state.shipPos);
+    glUniform3fv (u_LightPosHandle, 1, value_ptr (lightMatrix * engine.state.lightPos));
     glUniform3fv (u_EyePosHandle, 1, value_ptr (engine.state.eyePos));
 
     glBindBuffer (GL_ARRAY_BUFFER, vbo);

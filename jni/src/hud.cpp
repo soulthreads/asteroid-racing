@@ -52,7 +52,7 @@ void Hud::handleTouch(Engine &engine, float x, float y)
         float dy = y - controllerCenter[1];
 
         vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
-        quat xaxis = angleAxis(up[1] > 0 ? 5*dx : -5*dx, vec3(0, -1, 0));
+        quat xaxis = angleAxis (up[1] > 0 ? 5*dx : -5*dx, vec3(0, -1, 0));
         quat yaxis = angleAxis (5*dy, vec3(-1, 0, 0));
         engine.state.shipQuat = normalize (xaxis * engine.state.shipQuat * yaxis);
 
