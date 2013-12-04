@@ -24,12 +24,14 @@ using std::unique_ptr;
 
 using glm::vec2;
 using glm::vec3;
+using glm::vec4;
+using glm::uvec3;
 using glm::normalize;
 using glm::cross;
 using glm::dot;
 using glm::ballRand;
-using glm::vec4;
-using glm::uvec3;
+using glm::sphericalRand;
+
 using glm::mat4;
 using glm::value_ptr;
 using glm::translate;
@@ -38,6 +40,7 @@ using glm::rotate;
 using glm::perspective;
 using glm::ortho;
 using glm::lookAt;
+
 using glm::quat;
 using glm::angleAxis;
 using glm::mat4_cast;

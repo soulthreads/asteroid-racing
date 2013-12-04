@@ -75,5 +75,6 @@ void Ship::draw(Engine &engine) {
 
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
+    // TODO: mix colors depending on speed
     particles->draw (engine);
 }
