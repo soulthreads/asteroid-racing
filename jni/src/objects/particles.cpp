@@ -64,7 +64,7 @@ void Particles::draw(Engine &engine)
     glEnableVertexAttribArray (a_LifeTimeHandle);
 
     glEnable (GL_BLEND);
-    glBlendFunc (GL_ONE, GL_ONE);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE);
     glDepthMask (false);
     glDrawArrays (GL_POINTS, 0, maxCount);
     glDepthMask (true);
