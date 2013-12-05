@@ -59,12 +59,6 @@ struct saved_state {
     vec3 eyePos;
     vec2 camRot;
     vec4 lightPos;
-    vec3 shipPos;
-    vec3 shipVel;
-    quat shipQuat;
-    bool throttle;
-    bool fire;
-    bool rotating;
 };
 
 typedef struct {

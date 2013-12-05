@@ -2,6 +2,7 @@
 #define HUD_H
 
 #include "engine.h"
+#include "objects/ship.h"
 
 class Hud
 {
@@ -28,11 +29,15 @@ private:
 
     mat4 modelMatrix;
 
+    bool rotating;
+
 public:
     Hud(Engine &engine);
     ~Hud ();
-    void handleTouch (Engine &engine, float x, float y);
+    void handleTouch (Engine &engine, Ship &ship, float x, float y);
     void draw (Engine &engine);
+    bool getRotating() const;
+    void setRotating(bool value);
 };
 
 #endif // HUD_H

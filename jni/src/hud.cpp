@@ -46,19 +46,19 @@ Hud::~Hud()
     }
 }
 
-void Hud::handleTouch(Engine &engine, float x, float y)
+void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
 {
     float wx = x * engine.aspectRatio;
     if ((wx < controllerCenter[0]+controllerBgSize)
             && (y < controllerCenter[1] + controllerBgSize)) {
-        engine.state.rotating = true;
+        rotating = true;
         float dx = wx - controllerCenter[0];
         float dy = y - controllerCenter[1];
 
-        vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
+        vec3 up = ship.getOrientation () * vec3 (0, 1, 0);
         quat xaxis = angleAxis (-5*dx, up);
         quat yaxis = angleAxis (5*dy, vec3(-1, 0, 0));
-        engine.state.shipQuat = normalize (xaxis * engine.state.shipQuat * yaxis);
+        ship.setOrientation (normalize (xaxis * ship.getOrientation () * yaxis));
 
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
@@ -66,10 +66,10 @@ void Hud::handleTouch(Engine &engine, float x, float y)
                                      vec2(-0.5,-0.5), vec2(0.5, 0.5));
     } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
-        engine.state.throttle = true;
+        ship.setThrottle (true);
     } else if ((wx > fireCenter[0] - fireSize)
                && (y < fireCenter[1] + fireSize)) {
-        engine.state.fire = true;
+        ship.setFire (true);
     }
 }
 
@@ -115,4 +115,14 @@ void Hud::draw(Engine &engine)
 
     glDisable (GL_BLEND);
     glEnable (GL_DEPTH_TEST);
+}
+
+bool Hud::getRotating() const
+{
+    return rotating;
+}
+
+void Hud::setRotating(bool value)
+{
+    rotating = value;
 }

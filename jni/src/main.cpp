@@ -116,25 +116,28 @@ static void engineDrawFrame (Engine &engine) {
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    vec3 dv = engine.state.shipQuat * vec3 (0, 0, 1);
-    vec3 up = engine.state.shipQuat * vec3 (0, 1, 0);
-    vec3 rt = engine.state.shipQuat * vec3 (1, 0, 0);
+    auto shipOrientation = ship->getOrientation ();
+    vec3 dv = shipOrientation * vec3 (0, 0, 1);
+    vec3 up = shipOrientation * vec3 (0, 1, 0);
+    vec3 rt = shipOrientation * vec3 (1, 0, 0);
 
     vec3 offset = engine.state.camRot[0] * rt - (1 + engine.state.camRot[1]) * up + 2.0f * dv;
-    if (!engine.state.rotating) engine.state.camRot *= 0.95f;
+    if (!hud->getRotating ()) engine.state.camRot *= 0.95f;
 
     engine.viewMatrix = lookAt (vec3 (0), offset, up);
     skybox->draw (engine);
 
     ship->update (engine, ast->getAsteroids ());
-    engine.state.eyePos = engine.state.shipPos - offset;
-    engine.viewMatrix = lookAt (engine.state.eyePos, engine.state.shipPos+dv, up);
+    auto shipPos = ship->getPosition ();
+
+    engine.state.eyePos = shipPos - offset;
+    engine.viewMatrix = lookAt (engine.state.eyePos, shipPos+dv, up);
 
     ast->draw (engine);
 
     ship->draw (engine);
 
-    envp->addParticles (engine.state.shipPos+ballRand (100.0f)+engine.state.shipVel, vec3 (0), 1);
+    envp->addParticles (shipPos+ballRand (100.0f), vec3 (0), 1);
     envp->draw (engine);
 
     hud->draw (engine);
@@ -184,9 +187,9 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
         auto actionIndex = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
                 >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
-        engine.state.throttle = false;
-        engine.state.fire = false;
-        engine.state.rotating = false;
+        ship->setThrottle (false);
+        ship->setFire (false);
+        hud->setRotating (false);
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
             for (size_t i = 0; i < count; ++i) {
                 if (!(actionIndex == i
@@ -194,7 +197,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                             || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP))) {
                     float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
                     float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
-                    hud->handleTouch (engine, x, y);
+                    hud->handleTouch (engine, *ship.get (), x, y);
                 }
             }
         }
@@ -267,11 +270,7 @@ void android_main(struct android_app* state) {
         // We are starting with a previous saved state; restore from it.
         engine.state = *(struct saved_state*)state->savedState;
     } else {
-        engine.state.shipQuat = angleAxis (0.f, vec3 (0, 0, 1));
-        engine.state.shipPos = vec3(0);
-        engine.state.shipVel = vec3(0);
         engine.state.lightPos = vec4 (-1000, 0, 0, 1);
-        engine.state.throttle = false;
     }
 
     while (1) {

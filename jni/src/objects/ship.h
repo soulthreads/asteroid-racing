@@ -23,6 +23,11 @@ private:
 
     mat4 modelMatrix, mvMatrix, mvpMatrix;
 
+    vec3 position, velocity;
+    quat orientation;
+    static const float shipSize = 0.8f;
+
+    bool throttle, fire;
     unique_ptr<Particles> throttleParticles;
     unique_ptr<Particles> fireParticles;
     float throttleTime;
@@ -33,6 +38,14 @@ public:
 
     void draw (Engine &engine);
     void update(Engine &engine, vector<asteroid> &asteroids);
+    vec3 getPosition() const;
+    void setPosition(const vec3 &value);
+    vec3 getVelocity() const;
+    void setVelocity(const vec3 &value);
+    quat getOrientation() const;
+    void setOrientation(const quat &value);
+    void setThrottle(bool value);
+    void setFire(bool value);
 };
 
 #endif // SHIP_H

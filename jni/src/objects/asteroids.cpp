@@ -174,6 +174,7 @@ void Asteroids::draw(Engine &engine)
     glGetBufferParameteriv (GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
     for (auto it = asteroids.begin (); it != asteroids.end ();) {
+        if (it->stamina <= 0) it->blownUp = true;
         if (it->blownUp) {
             for (int i = 0; i < particlesCount/2; i++)
                 explosion->addParticles (it->position+sphericalRand(it->radius),
