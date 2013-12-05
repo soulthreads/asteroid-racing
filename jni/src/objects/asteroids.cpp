@@ -114,7 +114,7 @@ Asteroids::Asteroids(Engine &engine)
     glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 10; ++i) {
         vector<vec3> tmpVertices = icoVertices;
         for (auto &v : tmpVertices) {
             v += (0.25f*simplex((vec3(i)+v))
@@ -139,10 +139,10 @@ Asteroids::Asteroids(Engine &engine)
 
         float radius = linearRand (2.f, 32.f);
         asteroids.push_back (asteroid {vbo,
-                                       sphericalRand (10.f)+ballRand (500.f),
-                                       ballRand (1.f),
+                                       sphericalRand (10.f)+ballRand (200.f),
+                                       ballRand (2.f),
                                        angleAxis(0.f, ballRand (1.f)),
-                                       angleAxis(linearRand (0.f, 1.f), ballRand (1.f)),
+                                       angleAxis(linearRand (-1.f, 1.f), ballRand (1.f)),
                                        radius, 1.0, false});
     }
     // TODO: add bump mapping

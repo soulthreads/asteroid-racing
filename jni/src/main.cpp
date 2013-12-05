@@ -121,7 +121,7 @@ static void engineDrawFrame (Engine &engine) {
     vec3 up = shipOrientation * vec3 (0, 1, 0);
     vec3 rt = shipOrientation * vec3 (1, 0, 0);
 
-    vec3 offset = engine.state.camRot[0] * rt - (1 + engine.state.camRot[1]) * up + 2.0f * dv;
+    vec3 offset = engine.state.camRot[0] * rt - (0.5f + engine.state.camRot[1]) * up + 2.0f * dv;
     if (!hud->getRotating ()) engine.state.camRot *= 0.95f;
 
     engine.viewMatrix = lookAt (vec3 (0), offset, up);
@@ -131,7 +131,8 @@ static void engineDrawFrame (Engine &engine) {
     auto shipPos = ship->getPosition ();
 
     engine.state.eyePos = shipPos - offset;
-    engine.viewMatrix = lookAt (engine.state.eyePos, shipPos+dv, up);
+    vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
+    engine.viewMatrix = lookAt (engine.state.eyePos, center, up);
 
     ast->draw (engine);
 

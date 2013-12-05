@@ -27,7 +27,7 @@ Ship::Ship (Engine &engine) {
                                                       engine.width/16.0, 1/256.0));
     fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 512,
                                                           engine.width/16.0, 1/1024.0));
-    throttleTime = 0;
+    throttleTime = 0; fireTime = 0;
 }
 
 Ship::~Ship () {
@@ -48,6 +48,7 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
                 (3.0-dot (normalize (velocity), normalize (dv))) / 2.0 : 1.0;
 
     if (throttle) {
+        // TODO: add point lights from throttle
         velocity += dv * dt * speedFactor * 10.f;
         throttleParticles->addParticles (position-0.4f*dv,
                                  velocity-2.0f*dv, 2);
@@ -61,11 +62,17 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
     }
     throttleParticles->setParticlesColor (mix (vec3(1,0.5,0.1), vec3(0.1, 0.5, 1), throttleTime));
 
-    if (fire) {
-        fireParticles->addParticles (position + 0.12f*up + 0.2f*rt,
+    if (fire && !fireStopping && (fireTime < 8)) {
+        fireTime += 8;
+        for (int i = 0; i < 4; ++i) {
+        fireParticles->addParticles (position + 0.12f*up + 0.2f*rt - 0.3f*i*dv,
                                      velocity + speedFactor * 100.f*dv, 1);
-        fireParticles->addParticles (position + 0.12f*up - 0.2f*rt,
+        fireParticles->addParticles (position + 0.12f*up - 0.2f*rt - 0.3f*i*dv,
                                      velocity + speedFactor * 100.f*dv, 1);
+        }
+    } else {
+        fireStopping = fireTime > 0;
+        if (fireStopping) fireTime -= dt * 100;
     }
 
     for (auto &a : asteroids) {

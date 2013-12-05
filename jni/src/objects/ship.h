@@ -30,7 +30,8 @@ private:
     bool throttle, fire;
     unique_ptr<Particles> throttleParticles;
     unique_ptr<Particles> fireParticles;
-    float throttleTime;
+    float throttleTime, fireTime;
+    bool fireStopping;
 
 public:
     Ship (Engine &engine);

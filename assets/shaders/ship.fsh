@@ -19,7 +19,7 @@ void main()
 
     float specular = 0.0;
     if (diffuse > 0.0) {
-        specular = pow (max (dot (eyeVector, normalize (reflect (-lightVector, v_Normal))), 0.0), 100.0);
+        specular = 0.5 * pow (max (dot (eyeVector, normalize (reflect (-lightVector, v_Normal))), 0.0), 100.0);
     }
 
     gl_FragColor = v_Color * (ambient + diffuse) + specular;
