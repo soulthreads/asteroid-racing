@@ -110,6 +110,8 @@ inline static double now_ms() {
     return 1000.0 * res.tv_sec + (double) res.tv_nsec / 1e6;
 }
 
+static float timeCounter = 0;
+static int frameCounter;
 static void engineDrawFrame (Engine &engine) {
     if (engine.display == NULL) {
         // No display.
@@ -132,9 +134,18 @@ static void engineDrawFrame (Engine &engine) {
     skybox->draw (engine);
 
     ship->update (engine, ast->getAsteroids ());
+
     char buffer[64];
     sprintf (buffer, "Speed: %.1f", length (ship->getVelocity ()));
     text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 1, A_PLUS, A_PLUS, buffer});
+
+    if (timeCounter > 1000) {
+        sprintf (buffer, "FPS: %d", frameCounter);
+        text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 1, A_MINUS, A_PLUS, buffer});
+        frameCounter = 0;
+        timeCounter = 0;
+    }
+
     auto shipPos = ship->getPosition ();
 
     engine.state.eyePos = shipPos - offset;
@@ -155,6 +166,8 @@ static void engineDrawFrame (Engine &engine) {
 
     double end = now_ms ();
     engine.delta = end - start;
+    timeCounter += engine.delta;
+    frameCounter++;
 }
 
 /**
