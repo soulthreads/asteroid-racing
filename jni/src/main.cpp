@@ -13,6 +13,7 @@
 #include "util/logs.h"
 
 #include "hud.h"
+#include "util/text.h"
 #include "objects/cube.h"
 #include "objects/skybox.h"
 #include "objects/ship.h"
@@ -24,6 +25,7 @@ unique_ptr<Skybox> skybox;
 unique_ptr<Ship> ship;
 unique_ptr<Hud> hud;
 unique_ptr<Particles> envp;
+unique_ptr<Text> text;
 
 /**
  * Initialize an EGL context for the current display.
@@ -87,10 +89,12 @@ static int engineInitDisplay (Engine &engine) {
     glEnable (GL_DEPTH_TEST);
 
     engine.projectionMatrix = perspective (60.0f, ((float)w)/h, 0.1f, 2000.0f);
-    engine.orthoMatrix = ortho (-(engine.aspectRatio), +engine.aspectRatio,
+    engine.orthoMatrix = ortho (-engine.aspectRatio, +engine.aspectRatio,
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
     hud = unique_ptr<Hud> (new Hud (engine));
+    text = unique_ptr<Text> (new Text);
+    text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
 
     skybox = unique_ptr<Skybox>(new Skybox (engine));
     ship = unique_ptr<Ship> (new Ship (engine));
@@ -128,6 +132,9 @@ static void engineDrawFrame (Engine &engine) {
     skybox->draw (engine);
 
     ship->update (engine, ast->getAsteroids ());
+    char buffer[64];
+    sprintf (buffer, "Speed: %.1f", length (ship->getVelocity ()));
+    text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 1, A_PLUS, A_PLUS, buffer});
     auto shipPos = ship->getPosition ();
 
     engine.state.eyePos = shipPos - offset;
@@ -142,6 +149,7 @@ static void engineDrawFrame (Engine &engine) {
     envp->draw (engine);
 
     hud->draw (engine);
+    text->draw (engine);
 
     eglSwapBuffers(engine.display, engine.surface);
 
@@ -154,6 +162,7 @@ static void engineDrawFrame (Engine &engine) {
  */
 static void engineTermDisplay (Engine &engine) {
     hud.reset ();
+    text.reset ();
     skybox.reset ();
     ship.reset ();
     envp.reset ();

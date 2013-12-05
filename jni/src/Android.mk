@@ -13,7 +13,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(PNG_PATH) \
 LOCAL_SRC_FILES := main.cpp \
         util/shader.cpp \
         util/assets.cpp \
-        objects/cube.cpp \
+        util/text.cpp \
         objects/skybox.cpp \
         objects/sun.cpp \
         objects/ship.cpp \

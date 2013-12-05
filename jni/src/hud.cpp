@@ -15,7 +15,7 @@ Hud::Hud(Engine &engine)
     };
     vertexData.assign (vs, vs+24);
 
-    program = buildProgramFromAssets ("shaders/textured.vsh", "shaders/textured.fsh");
+    program = buildProgramFromAssets ("shaders/hud.vsh", "shaders/hud.fsh");
     validateProgram (program);
     u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
     u_TexUnitHandle = glGetUniformLocation (program, "u_TexUnit");
@@ -76,9 +76,9 @@ void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
 void Hud::draw(Engine &engine)
 {
     glUseProgram (program);
-    glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, stride, vertexData.data ());
+    glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, stride, &vertexData[0]);
     glEnableVertexAttribArray (a_PositionHandle);
-    glVertexAttribPointer (a_TexCoordsHandle, 2, GL_FLOAT, GL_FALSE, stride, vertexData.data ()+2);
+    glVertexAttribPointer (a_TexCoordsHandle, 2, GL_FLOAT, GL_FALSE, stride, &vertexData[2]);
     glEnableVertexAttribArray (a_TexCoordsHandle);
 
     glActiveTexture (GL_TEXTURE1);
