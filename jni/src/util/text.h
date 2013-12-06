@@ -32,9 +32,11 @@ private:
     map<string, textUnit> strings;
 
     GLuint fontTex;
-    static const float w = 1/16.0, h = 1/8.0;
-    static const int roww = 1/w;
-    vector<GLfloat> makeSymbol (vec2 pos, float size, char c);
+    static const float texw = 512, texh = 256;
+    static const float symw = 16, symh = 32;
+    static const int rowc = texw / symw;
+    static const float factor = 1/256.0;
+    vector<GLfloat> makeSymbol (vec2 pos, float size, uint c);
 
     bool changed;
     void updateVertexData();

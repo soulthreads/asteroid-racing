@@ -26,19 +26,30 @@ Text::~Text()
     }
 }
 
-vector<GLfloat> Text::makeSymbol(vec2 pos, float size, char c)
+vector<GLfloat> Text::makeSymbol(vec2 pos, float size, uint ch)
 {
-    int offset = c-32;
-    if (offset < 0) offset = 0;
-    float x = (offset % roww) * w;
-    float y = (offset / roww) * h;
+    // Begin UTF-8 madness.
+    int offset = 0;
+    if (ch == 0xD081) offset = 95;
+    else if (ch == 0xD191) offset = 120;
+    else if (ch >= 0xD090 && ch <= 0xD0BF) offset = (ch & 0xFF) - 15-33;
+    else if (ch >= 0xD180 && ch <= 0xD18F) offset = (ch & 0xFF) + 16;
+    else if (ch >= 0x0020 && ch <= 0x007E) offset = ch - 0x20;
+    // End UTF-8 madness.
 
-    vector<GLfloat> ret = {pos[0], pos[1]+size*h, x, y,
-                          pos[0], pos[1], x, y+h,
-                          pos[0]+size*w, pos[1]+size*h, x+w, y,
-                          pos[0], pos[1], x, y+h,
-                          pos[0]+size*w, pos[1], x+w, y+h,
-                          pos[0]+size*w, pos[1]+size*h, x+w, y};
+    float sw = symw / texw, th = symh / texh;
+    float s = (offset % rowc) * sw;
+    float t = (offset / rowc) * th;
+
+    float pw = factor * symw, ph = factor * symh;
+    vector<GLfloat> ret = {
+        pos[0],         pos[1]+size*ph, s,    t,
+        pos[0],         pos[1],         s,    t+th,
+        pos[0]+size*pw, pos[1]+size*ph, s+sw, t,
+        pos[0],         pos[1],         s,    t+th,
+        pos[0]+size*pw, pos[1],         s+sw, t+th,
+        pos[0]+size*pw, pos[1]+size*ph, s+sw, t
+    };
     return ret;
 }
 
@@ -75,12 +86,24 @@ void Text::updateVertexData ()
     for (auto &kv : strings) {
         auto t = kv.second;
         auto pos = t.position;
-        pos[0] -= (t.ax/2.0) * t.text.size() * t.size * w;
-        pos[1] -= (t.ay/2.0) * t.size * h;
-        for (char c : t.text) {
-            auto symbol = makeSymbol (pos, t.size, c);
+        uint width = 0;
+        for (char c : t.text) { if (c < 0xC0) ++width; }
+        pos[0] -= (t.ax/2.0) * width * t.size * factor * symw;
+        pos[1] -= (t.ay/2.0) * t.size * factor * symh;
+        int i = 0;
+        while (i < t.text.size ()) {
+            unsigned char c1 = t.text[i], c2 = t.text[i+1];
+            uint ch = 0;
+            if (c1 < 0xC0) { // ASCII character
+                ch = c1;
+                i += 1;
+            } else { // UTF-8 character
+                ch = (c1 << 8) | c2;
+                i += 2;
+            }
+            auto symbol = makeSymbol (pos, t.size, ch);
             vertexData.insert (vertexData.end (), symbol.begin (), symbol.end ());
-            pos[0] += t.size * w;
+            pos[0] += t.size * factor * symw;
         }
     }
 }
