@@ -12,6 +12,18 @@ Particles::Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay)
     vertexData.reserve (maxCount * components);
     cursor = maxCount;
 
+}
+
+Particles::~Particles()
+{
+    if (particleTex) {
+        glDeleteTextures (1, &particleTex);
+        particleTex = 0;
+    }
+}
+
+void Particles::init (Engine &engine) {
+    token = engine.token;
     program = buildProgramFromAssets ("shaders/particle.vsh", "shaders/particle.fsh");
     validateProgram (program);
     u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
@@ -27,16 +39,10 @@ Particles::Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay)
     glBindTexture (GL_TEXTURE_2D, particleTex);
 }
 
-Particles::~Particles()
-{
-    if (particleTex) {
-        glDeleteTextures (1, &particleTex);
-        particleTex = 0;
-    }
-}
-
 void Particles::draw(Engine &engine)
 {
+    if (token != engine.token) init (engine);
+
     for (auto &p : particles) {
         p.position += p.velocity * (float)(engine.delta * 0.001);
         p.lifeTime += engine.delta * decayFactor;
@@ -53,8 +59,8 @@ void Particles::draw(Engine &engine)
     glUniform3fv (u_ColorHandle, 1, value_ptr (particlesColor));
     glUniform1f (u_SizeHandle, particleSize);
 
-//    glActiveTexture (GL_TEXTURE2);
-//    glBindTexture (GL_TEXTURE_2D, particleTex);
+    glActiveTexture (GL_TEXTURE2);
+    glBindTexture (GL_TEXTURE_2D, particleTex);
     glUniform1i (u_TexUnitHandle, 2);
 
     glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, stride, vertexData.data ());

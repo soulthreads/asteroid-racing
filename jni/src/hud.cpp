@@ -15,19 +15,6 @@ Hud::Hud(Engine &engine)
     };
     vertexData.assign (vs, vs+24);
 
-    program = buildProgramFromAssets ("shaders/hud.vsh", "shaders/hud.fsh");
-    validateProgram (program);
-    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
-    u_TexUnitHandle = glGetUniformLocation (program, "u_TexUnit");
-
-    a_PositionHandle = glGetAttribLocation (program, "a_Position");
-    a_TexCoordsHandle = glGetAttribLocation (program, "a_TexCoords");
-
-    controllerTex = loadTextureFromAsset ("textures/controller.png");
-    controllerBgTex = loadTextureFromAsset ("textures/controller_bg.png");
-    throttleTex = loadTextureFromAsset ("textures/throttle.png");
-    fireTex = loadTextureFromAsset ("textures/fire.png");
-
     controllerCenter = vec3 (-engine.aspectRatio+controllerBgSize, -1+controllerBgSize, 0);
     throttleCenter = vec3 (engine.aspectRatio-throttleSize, -1+throttleSize, 0);
     fireCenter = vec3 (engine.aspectRatio-fireSize, -1+2.f*throttleSize+fireSize, 0);
@@ -44,6 +31,24 @@ Hud::~Hud()
         controllerBgTex = 0;
         throttleTex = 0;
     }
+}
+
+void Hud::init (Engine &engine) {
+    token = engine.token;
+
+    program = buildProgramFromAssets ("shaders/hud.vsh", "shaders/hud.fsh");
+    validateProgram (program);
+    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
+    u_TexUnitHandle = glGetUniformLocation (program, "u_TexUnit");
+
+    a_PositionHandle = glGetAttribLocation (program, "a_Position");
+    a_TexCoordsHandle = glGetAttribLocation (program, "a_TexCoords");
+
+    controllerTex = loadTextureFromAsset ("textures/controller.png");
+    controllerBgTex = loadTextureFromAsset ("textures/controller_bg.png");
+    throttleTex = loadTextureFromAsset ("textures/throttle.png");
+    fireTex = loadTextureFromAsset ("textures/fire.png");
+
 }
 
 void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
@@ -75,6 +80,8 @@ void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
 
 void Hud::draw(Engine &engine)
 {
+    if (token != engine.token) init (engine);
+
     glUseProgram (program);
     glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, stride, &vertexData[0]);
     glEnableVertexAttribArray (a_PositionHandle);

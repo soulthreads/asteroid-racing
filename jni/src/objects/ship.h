@@ -33,6 +33,9 @@ private:
     float throttleTime, fireTime;
     bool fireStopping;
 
+    int token;
+    void init(Engine &engine);
+
 public:
     Ship (Engine &engine);
     ~Ship ();
@@ -47,6 +50,8 @@ public:
     void setOrientation(const quat &value);
     void setThrottle(bool value);
     void setFire(bool value);
+    void saveState(Engine &engine);
+    void restoreState(Engine &engine);
 };
 
 #endif // SHIP_H

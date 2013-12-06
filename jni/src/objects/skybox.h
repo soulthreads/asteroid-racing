@@ -18,6 +18,9 @@ private:
 
     unique_ptr<Sun> sun;
 
+    int token;
+    void init(Engine &engine);
+
 public:
     Skybox (Engine &engine);
     ~Skybox ();

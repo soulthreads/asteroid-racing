@@ -89,30 +89,13 @@ GLushort Asteroids::getMiddlePoint(GLushort p1, GLushort p2)
 
 Asteroids::Asteroids(Engine &engine)
 {
-    program = buildProgramFromAssets ("shaders/asteroid.vsh", "shaders/asteroid.fsh");
-    validateProgram (program);
-    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
-    u_MvMatrixHandle = glGetUniformLocation (program, "u_MvMatrix");
-    u_LightPosHandle = glGetUniformLocation (program, "u_LightPos");
-    u_ColorHandle = glGetUniformLocation (program, "u_Color");
-    u_Color2Handle = glGetUniformLocation (program, "u_Color2");
-
-    a_PositionHandle = glGetAttribLocation (program, "a_Position");
-    a_NormalHandle = glGetAttribLocation (program, "a_Normal");
-
     createIcosphere (3);
 
-    vector<GLushort> indexData;
     for (auto &i : icoIndexes) {
         indexData.push_back (i[0]);
         indexData.push_back (i[1]);
         indexData.push_back (i[2]);
     }
-
-    glGenBuffers (1, &ibo);
-    glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
-    glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
     for (int i = 0; i < 10; ++i) {
         vector<vec3> tmpVertices = icoVertices;
@@ -130,15 +113,8 @@ Asteroids::Asteroids(Engine &engine)
             vertexData.push_back (v[2]);
         }
 
-        GLuint vbo;
-        glGenBuffers (1, &vbo);
-        glBindBuffer (GL_ARRAY_BUFFER, vbo);
-        glBufferData (GL_ARRAY_BUFFER, vertexData.size () * sizeof (GLfloat), vertexData.data (), GL_STATIC_DRAW);
-
-        glBindBuffer (GL_ARRAY_BUFFER, 0);
-
         float radius = linearRand (2.f, 32.f);
-        asteroids.push_back (asteroid {vbo,
+        asteroids.push_back (asteroid {0, vertexData,
                                        sphericalRand (10.f)+ballRand (200.f),
                                        ballRand (2.f),
                                        angleAxis(0.f, ballRand (1.f)),
@@ -165,8 +141,36 @@ Asteroids::~Asteroids ()
     }
 }
 
+void Asteroids::init (Engine &engine) {
+    token = engine.token;
+
+    program = buildProgramFromAssets ("shaders/asteroid.vsh", "shaders/asteroid.fsh");
+    validateProgram (program);
+    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
+    u_MvMatrixHandle = glGetUniformLocation (program, "u_MvMatrix");
+    u_LightPosHandle = glGetUniformLocation (program, "u_LightPos");
+    u_ColorHandle = glGetUniformLocation (program, "u_Color");
+    u_Color2Handle = glGetUniformLocation (program, "u_Color2");
+
+    a_PositionHandle = glGetAttribLocation (program, "a_Position");
+    a_NormalHandle = glGetAttribLocation (program, "a_Normal");
+
+    glGenBuffers (1, &ibo);
+    glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
+    glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    for (auto &a : asteroids) {
+        glGenBuffers (1, &a.vbo);
+        glBindBuffer (GL_ARRAY_BUFFER, a.vbo);
+        glBufferData (GL_ARRAY_BUFFER, a.vertices.size () * sizeof (GLfloat), a.vertices.data (), GL_STATIC_DRAW);
+    }
+    glBindBuffer (GL_ARRAY_BUFFER, 0);
+}
+
 void Asteroids::draw(Engine &engine)
 {
+    if (token != engine.token) init (engine);
     glUseProgram (program);
 
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);

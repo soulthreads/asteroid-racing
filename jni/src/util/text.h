@@ -40,6 +40,10 @@ private:
 
     bool changed;
     void updateVertexData();
+
+    int token;
+    void init(const Engine &engine);
+
 public:
     Text ();
     ~Text ();

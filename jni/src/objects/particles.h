@@ -34,6 +34,9 @@ private:
     GLuint components;
     size_t cursor;
 
+    int token;
+    void init(Engine &engine);
+
 public:
     Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay);
     ~Particles();

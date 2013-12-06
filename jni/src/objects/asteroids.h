@@ -6,6 +6,7 @@
 
 typedef struct {
     GLuint vbo;
+    vector<GLfloat> vertices;
     vec3 position;
     vec3 velocity;
     quat orientation;
@@ -35,10 +36,14 @@ private:
 
     vector<vec3> icoVertices;
     vector<uvec3> icoIndexes;
+    vector<GLushort> indexData;
     map <uint, GLushort> icoIndexCache;
     GLushort index;
     void createIcosphere(uint subdivisions);
     GLushort getMiddlePoint(GLushort p1, GLushort p2);
+
+    int token;
+    void init(Engine &engine);
 
 public:
     Asteroids (Engine &engine);

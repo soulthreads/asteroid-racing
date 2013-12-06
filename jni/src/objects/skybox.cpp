@@ -1,6 +1,27 @@
 #include "skybox.h"
 
+#define LOG_TAG "skybox"
+#include "util/logs.h"
+
 Skybox::Skybox(Engine &engine) {
+    init (engine);
+    sun = unique_ptr<Sun> (new Sun (vec3(engine.state.lightPos), engine.width/6.0));
+}
+
+Skybox::~Skybox () {
+    if (program) {
+        glDeleteProgram (program);
+        glDeleteBuffers (1, &vbo);
+        vbo = 0;
+        glDeleteBuffers (1, &ibo);
+        ibo = 0;
+        glDeleteTextures (1, &textures);
+        textures = 0;
+    }
+}
+
+void Skybox::init (Engine &engine) {
+    token = engine.token;
     program = buildProgramFromAssets ("shaders/skybox.vsh", "shaders/skybox.fsh");
     validateProgram (program);
     u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
@@ -59,28 +80,11 @@ Skybox::Skybox(Engine &engine) {
 
     glActiveTexture (GL_TEXTURE0);
     glBindTexture (GL_TEXTURE_CUBE_MAP, textures);
-
-    sun = unique_ptr<Sun> (new Sun (vec3(engine.state.lightPos), engine.width/8.0));
-}
-
-Skybox::~Skybox () {
-    if (vbo) {
-        glDeleteBuffers (1, &vbo);
-        vbo = 0;
-    }
-
-    if (ibo) {
-        glDeleteBuffers (1, &ibo);
-        ibo = 0;
-    }
-
-    if (textures) {
-        glDeleteTextures (1, &textures);
-        textures = 0;
-    }
 }
 
 void Skybox::draw (Engine &engine) {
+    if (engine.token != token) init (engine);
+
     glUseProgram (program);
 
     mat4 mvp = engine.projectionMatrix * engine.viewMatrix;

@@ -31,6 +31,9 @@ private:
 
     bool rotating;
 
+    int token;
+    void init(Engine &engine);
+
 public:
     Hud(Engine &engine);
     ~Hud ();

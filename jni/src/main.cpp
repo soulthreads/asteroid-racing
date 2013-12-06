@@ -29,6 +29,12 @@ unique_ptr<Ship> ship;
 unique_ptr<Particles> envp;
 unique_ptr<Text> text;
 
+inline static double now_ms() {
+    struct timespec res;
+    clock_gettime(CLOCK_REALTIME, &res);
+    return 1000.0 * res.tv_sec + (double) res.tv_nsec / 1e6;
+}
+
 /**
  * Initialize an EGL context for the current display.
  */
@@ -84,6 +90,7 @@ static int engineInitDisplay (Engine &engine) {
     engine.aspectRatio = w / (float) h;
     engine.animating = true;
     engine.delta = 0;
+    LOGI ("display init!");
 
     // Initialize GL state.
     glClearColor (0.2f, 0.2f, 0.2f, 0.0f);
@@ -94,23 +101,18 @@ static int engineInitDisplay (Engine &engine) {
     engine.orthoMatrix = ortho (-engine.aspectRatio, +engine.aspectRatio,
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
-    menu = unique_ptr<Menu> (new Menu);
-    hud = unique_ptr<Hud> (new Hud (engine));
-    text = unique_ptr<Text> (new Text);
-    text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
+    if (menu == nullptr) {
+        menu = unique_ptr<Menu> (new Menu (engine));
+        hud = unique_ptr<Hud> (new Hud (engine));
+        text = unique_ptr<Text> (new Text);
+        text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
 
-    skybox = unique_ptr<Skybox>(new Skybox (engine));
-    ship = unique_ptr<Ship> (new Ship (engine));
-    envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
-    ast = unique_ptr<Asteroids> (new Asteroids (engine));
-
+        skybox = unique_ptr<Skybox>(new Skybox (engine));
+        ship = unique_ptr<Ship> (new Ship (engine));
+        envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
+        ast = unique_ptr<Asteroids> (new Asteroids (engine));
+    }
     return 0;
-}
-
-inline static double now_ms() {
-    struct timespec res;
-    clock_gettime(CLOCK_REALTIME, &res);
-    return 1000.0 * res.tv_sec + (double) res.tv_nsec / 1e6;
 }
 
 static float timeCounter = 0;
@@ -195,14 +197,6 @@ static void engineDrawFrame (Engine &engine) {
  * Tear down the EGL context currently associated with the display.
  */
 static void engineTermDisplay (Engine &engine) {
-    menu.reset ();
-    hud.reset ();
-    text.reset ();
-    skybox.reset ();
-    ship.reset ();
-    envp.reset ();
-    ast.reset ();
-
     if (engine.display != EGL_NO_DISPLAY) {
         eglMakeCurrent (engine.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (engine.context != EGL_NO_CONTEXT) {
@@ -287,6 +281,8 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
     switch (cmd) {
     case APP_CMD_SAVE_STATE:
         // The system has asked us to save our current state.  Do so.
+        LOGI ("Save state!");
+        ship->saveState (engine);
         engine.app->savedState = malloc(sizeof(struct saved_state));
         *((struct saved_state*)engine.app->savedState) = engine.state;
         engine.app->savedStateSize = sizeof(struct saved_state);
@@ -294,17 +290,17 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
     case APP_CMD_INIT_WINDOW:
         if (engine.app->window != NULL) {
             engineInitDisplay(engine);
-            engineDrawFrame(engine);
         }
         break;
     case APP_CMD_TERM_WINDOW:
         engineTermDisplay(engine);
         break;
     case APP_CMD_GAINED_FOCUS:
+        engine.token = rand ();
         break;
     case APP_CMD_LOST_FOCUS:
         engine.animating = false;
-        engineDrawFrame(engine);
+//        engineDrawFrame(engine);
         break;
     }
 }
@@ -328,8 +324,10 @@ void android_main(struct android_app* state) {
 
     initAssetManager (state->activity->assetManager);
 
+    srand (time(NULL));
     if (state->savedState != NULL) {
         // We are starting with a previous saved state; restore from it.
+        LOGI ("Restore state!");
         engine.state = *(struct saved_state*)state->savedState;
     } else {
         engine.state.lightPos = vec4 (-1000, 0, 0, 1);

@@ -1,6 +1,6 @@
 #include "menu.h"
 
-Menu::Menu()
+Menu::Menu(Engine &engine)
 {
     text = unique_ptr<Text> (new Text);
     text->addText ("start", textUnit {vec2(0,0), 1, A_CENTER, A_CENTER, "Tap anywhere to start."});

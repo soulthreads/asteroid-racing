@@ -3,23 +3,13 @@
 using namespace std;
 
 Ship::Ship (Engine &engine) {
-    program = buildProgramFromAssets ("shaders/ship.vsh", "shaders/ship.fsh");
-    validateProgram (program);
-    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
-    u_MvMatrixHandle = glGetUniformLocation (program, "u_MvMatrix");
-    u_LightPosHandle = glGetUniformLocation (program, "u_LightPos");
-    u_EyePosHandle = glGetUniformLocation (program, "u_EyePos");
-
-    a_PositionHandle = glGetAttribLocation (program, "a_Position");
-    a_NormalHandle = glGetAttribLocation (program, "a_Normal");
-    a_ColorHandle = glGetAttribLocation (program, "a_Color");
-
-    vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
     stride = 3 * 3 * sizeof (GLfloat);
 
     position = vec3 (0);
     velocity = vec3 (0);
     orientation = angleAxis (0.f, vec3 (0, 0, 1));
+
+    restoreState (engine);
 
     throttle = false;
     fire = false;
@@ -35,6 +25,23 @@ Ship::~Ship () {
         glDeleteBuffers (1, &vbo);
         vbo = 0;
     }
+}
+
+void Ship::init (Engine &engine) {
+    token = engine.token;
+
+    program = buildProgramFromAssets ("shaders/ship.vsh", "shaders/ship.fsh");
+    validateProgram (program);
+    u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
+    u_MvMatrixHandle = glGetUniformLocation (program, "u_MvMatrix");
+    u_LightPosHandle = glGetUniformLocation (program, "u_LightPos");
+    u_EyePosHandle = glGetUniformLocation (program, "u_EyePos");
+
+    a_PositionHandle = glGetAttribLocation (program, "a_Position");
+    a_NormalHandle = glGetAttribLocation (program, "a_Normal");
+    a_ColorHandle = glGetAttribLocation (program, "a_Color");
+
+    vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
 }
 
 void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
@@ -97,6 +104,8 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
 }
 
 void Ship::draw(Engine &engine) {
+    if (token != engine.token) init (engine);
+
     glUseProgram (program);
 
     modelMatrix = translate (mat4(1), position) * mat4_cast(orientation);
@@ -128,6 +137,18 @@ void Ship::draw(Engine &engine) {
 
     throttleParticles->draw (engine);
     fireParticles->draw (engine);
+}
+
+void Ship::saveState (Engine &engine) {
+    engine.state.shipPosition = position;
+    engine.state.shipVelocity = velocity;
+    engine.state.shipOrientation = orientation;
+}
+
+void Ship::restoreState (Engine &engine) {
+    position = engine.state.shipPosition;
+    velocity = engine.state.shipVelocity;
+    orientation = engine.state.shipOrientation;
 }
 
 vec3 Ship::getPosition() const

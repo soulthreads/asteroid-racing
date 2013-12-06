@@ -66,6 +66,9 @@ enum GameState {
 };
 
 struct saved_state {
+    vec3 shipPosition;
+    vec3 shipVelocity;
+    quat shipOrientation;
     vec3 eyePos;
     vec2 camRot;
     vec4 lightPos;
@@ -74,6 +77,7 @@ struct saved_state {
 typedef struct {
     struct android_app* app;
 
+    int token;
     bool animating;
     EGLDisplay display;
     EGLSurface surface;

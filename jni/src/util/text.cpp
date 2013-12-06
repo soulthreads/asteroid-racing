@@ -3,7 +3,18 @@
 Text::Text()
 {
     stride = (2 + 2) * sizeof (GLfloat);
+}
 
+Text::~Text()
+{
+    if (fontTex) {
+        glDeleteTextures (1, &fontTex);
+        fontTex = 0;
+    }
+}
+
+void Text::init (const Engine &engine) {
+    token = engine.token;
     program = buildProgramFromAssets ("shaders/text.vsh", "shaders/text.fsh");
     validateProgram (program);
     u_MvpMatrixHandle = glGetUniformLocation (program, "u_MvpMatrix");
@@ -16,14 +27,6 @@ Text::Text()
     fontTex = loadTextureFromAsset ("textures/terminus.png");
     glActiveTexture (GL_TEXTURE4);
     glBindTexture (GL_TEXTURE_2D, fontTex);
-}
-
-Text::~Text()
-{
-    if (fontTex) {
-        glDeleteTextures (1, &fontTex);
-        fontTex = 0;
-    }
 }
 
 vector<GLfloat> Text::makeSymbol(vec2 pos, float size, uint ch)
@@ -55,6 +58,8 @@ vector<GLfloat> Text::makeSymbol(vec2 pos, float size, uint ch)
 
 void Text::draw(const Engine &engine)
 {
+    if (token != engine.token) init (engine);
+
     if (changed) {
         updateVertexData ();
         changed = false;
@@ -62,7 +67,8 @@ void Text::draw(const Engine &engine)
     if (vertexData.size ()) {
         glUseProgram (program);
         glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.orthoMatrix));
-
+//        glActiveTexture (GL_TEXTURE4);
+//        glBindTexture (GL_TEXTURE_2D, fontTex);
         glUniform1i (u_TexUnitHandle, 4);
 
         glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, stride, &vertexData[0]);

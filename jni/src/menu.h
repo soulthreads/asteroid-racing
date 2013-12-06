@@ -9,7 +9,7 @@ class Menu
 private:
     unique_ptr<Text> text;
 public:
-    Menu ();
+    Menu (Engine &engine);
     ~Menu ();
     void draw (Engine &engine);
     void handleTouch (Engine &engine, float x, float y);
