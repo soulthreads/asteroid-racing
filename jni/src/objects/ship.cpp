@@ -151,6 +151,12 @@ void Ship::restoreState (Engine &engine) {
     orientation = engine.state.shipOrientation;
 }
 
+void Ship::reset () {
+    position = vec3 (0);
+    velocity = vec3 (0);
+    orientation = angleAxis (0.f, vec3 (0, 0, 1));
+}
+
 vec3 Ship::getPosition() const
 {
     return position;

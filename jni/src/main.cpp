@@ -115,20 +115,29 @@ static int engineInitDisplay (Engine &engine) {
     return 0;
 }
 
-static float timeCounter = 0;
-static int frameCounter = 0;
 static void engineDrawFrame (Engine &engine) {
     if (engine.display == NULL) {
         // No display.
         return;
     }
 
+    static float timeCounter = 0;
+    static int frameCounter = 0;
     double start = now_ms ();
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    if (ast->getAsteroids ().size () == 0)
-        engine.gameState = GAME_WIN_MENU;
+    static float winTimer = 0;
+    if ((engine.gameState == GAME_PLAYING) && (ast->getAsteroids ().size () == 0)) {
+        winTimer += engine.delta;
+        if (winTimer >= 5000) {
+            engine.gameState = GAME_WIN_MENU;
+            for (int i = 0; i < rand ()%10 + 1; ++i)
+                ast->addAsteroid (ballRand (100.f), linearRand (2.f, 25.f));
+            winTimer = 0;
+            ship->reset ();
+        }
+    }
 
     switch (engine.gameState) {
     case GAME_PLAYING:
@@ -179,6 +188,9 @@ static void engineDrawFrame (Engine &engine) {
 
         hud->draw (engine);
         text->draw (engine);
+
+        timeCounter += engine.delta;
+        frameCounter++;
         break;
     }
     default:
@@ -189,8 +201,6 @@ static void engineDrawFrame (Engine &engine) {
 
     double end = now_ms ();
     engine.delta = end - start;
-    timeCounter += engine.delta;
-    frameCounter++;
 }
 
 /**
@@ -239,7 +249,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                     if (engine.gameState == GAME_PLAYING) {
                         hud->handleTouch (engine, *ship.get (), x, y);
                     } else {
-                        menu->handleTouch (engine, x, y);
+                        menu->handleTouch (engine, actionMasked, x, y);
                     }
                 }
             }
@@ -255,12 +265,17 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                 if (eventKeyCode == AKEYCODE_MENU) {
                     engine.gameState = GAME_PAUSE_MENU;
                     return 1;
-                } else if (eventKeyCode == AKEYCODE_BACK) {
+                }
+                if (eventKeyCode == AKEYCODE_BACK) {
                     engine.gameState = GAME_PAUSE_MENU;
                     return 1;
                 }
                 break;
             case GAME_PAUSE_MENU:
+                if (eventKeyCode == AKEYCODE_MENU) {
+                    engine.gameState = GAME_PLAYING;
+                    return 1;
+                }
                 if (eventKeyCode == AKEYCODE_BACK) {
                     engine.gameState = GAME_START_MENU;
                     return 1;
@@ -311,6 +326,8 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
  * event loop for receiving input events and doing other things.
  */
 void android_main(struct android_app* state) {
+    srand (time(NULL));
+
     Engine engine;
 
     // Make sure glue isn't stripped.
@@ -324,7 +341,6 @@ void android_main(struct android_app* state) {
 
     initAssetManager (state->activity->assetManager);
 
-    srand (time(NULL));
     if (state->savedState != NULL) {
         // We are starting with a previous saved state; restore from it.
         LOGI ("Restore state!");

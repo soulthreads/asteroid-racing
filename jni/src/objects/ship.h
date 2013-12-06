@@ -52,6 +52,7 @@ public:
     void setFire(bool value);
     void saveState(Engine &engine);
     void restoreState(Engine &engine);
+    void reset();
 };
 
 #endif // SHIP_H

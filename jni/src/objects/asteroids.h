@@ -44,12 +44,14 @@ private:
 
     int token;
     void init(Engine &engine);
+    void updateVBOs();
 
 public:
     Asteroids (Engine &engine);
     ~Asteroids ();
     void draw (Engine &engine);
     vector<asteroid> &getAsteroids();
+    void addAsteroid(vec3 position, float radius);
 };
 
 #endif // ASTEROID_H
