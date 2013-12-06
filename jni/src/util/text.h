@@ -36,11 +36,14 @@ private:
     static const int roww = 1/w;
     vector<GLfloat> makeSymbol (vec2 pos, float size, char c);
 
+    bool changed;
+    void updateVertexData();
 public:
     Text ();
     ~Text ();
     void draw (const Engine &engine);
     void addText (const string& key, const textUnit& text);
+    void deleteText(const string &key);
 };
 
 #endif // TEXT_H

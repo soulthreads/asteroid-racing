@@ -135,18 +135,25 @@ static void engineDrawFrame (Engine &engine) {
 
     ship->update (engine, ast->getAsteroids ());
 
-    char buffer[64];
-    sprintf (buffer, "Speed: %.1f", length (ship->getVelocity ()));
-    text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 1, A_PLUS, A_PLUS, buffer});
+    auto shipPos = ship->getPosition ();
+    auto shipVel = ship->getVelocity ();
+
+    char buffer[256];
+    sprintf (buffer, "|v|=%.1fu/s", length (shipVel));
+    text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 0.8, A_PLUS, A_PLUS, buffer});
 
     if (timeCounter > 1000) {
         sprintf (buffer, "FPS: %d", frameCounter);
-        text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 1, A_MINUS, A_PLUS, buffer});
+        text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 0.5, A_MINUS, A_PLUS, buffer});
         frameCounter = 0;
         timeCounter = 0;
+
+        sprintf (buffer, "p: (%.1f, %.1f, %.1f) v: (%.1f, %.1f, %.1f)",
+                 shipPos[0], shipPos[1], shipPos[2],
+                shipVel[0], shipVel[1], shipVel[2]);
+        text->addText ("pos", textUnit {vec2 (0, 1), 0.5, A_CENTER, A_PLUS, buffer});
     }
 
-    auto shipPos = ship->getPosition ();
 
     engine.state.eyePos = shipPos - offset;
     vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;

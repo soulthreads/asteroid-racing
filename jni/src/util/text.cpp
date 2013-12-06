@@ -44,6 +44,10 @@ vector<GLfloat> Text::makeSymbol(vec2 pos, float size, char c)
 
 void Text::draw(const Engine &engine)
 {
+    if (changed) {
+        updateVertexData ();
+        changed = false;
+    }
     if (vertexData.size ()) {
         glUseProgram (program);
         glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (engine.orthoMatrix));
@@ -65,9 +69,8 @@ void Text::draw(const Engine &engine)
     }
 }
 
-void Text::addText(const string &key, const textUnit &text)
+void Text::updateVertexData ()
 {
-    strings[key] = text;
     vertexData.erase (vertexData.begin (), vertexData.end ());
     for (auto &kv : strings) {
         auto t = kv.second;
@@ -75,10 +78,21 @@ void Text::addText(const string &key, const textUnit &text)
         pos[0] -= (t.ax/2.0) * t.text.size() * t.size * w;
         pos[1] -= (t.ay/2.0) * t.size * h;
         for (char c : t.text) {
-            if (c == '\0') break;
             auto symbol = makeSymbol (pos, t.size, c);
             vertexData.insert (vertexData.end (), symbol.begin (), symbol.end ());
             pos[0] += t.size * w;
         }
     }
+}
+
+void Text::addText(const string &key, const textUnit &text)
+{
+    strings[key] = text;
+    changed = true;
+}
+
+void Text::deleteText (const string &key)
+{
+    strings.erase (key);
+    changed = true;
 }
