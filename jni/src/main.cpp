@@ -12,6 +12,7 @@
 #define LOG_TAG "AsteroidRacing"
 #include "util/logs.h"
 
+#include "menu.h"
 #include "hud.h"
 #include "util/text.h"
 #include "objects/cube.h"
@@ -20,10 +21,11 @@
 #include "objects/particles.h"
 #include "objects/asteroids.h"
 
+unique_ptr<Menu> menu;
+unique_ptr<Hud> hud;
 unique_ptr<Asteroids> ast;
 unique_ptr<Skybox> skybox;
 unique_ptr<Ship> ship;
-unique_ptr<Hud> hud;
 unique_ptr<Particles> envp;
 unique_ptr<Text> text;
 
@@ -92,6 +94,7 @@ static int engineInitDisplay (Engine &engine) {
     engine.orthoMatrix = ortho (-engine.aspectRatio, +engine.aspectRatio,
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
+    menu = unique_ptr<Menu> (new Menu);
     hud = unique_ptr<Hud> (new Hud (engine));
     text = unique_ptr<Text> (new Text);
     text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
@@ -111,7 +114,7 @@ inline static double now_ms() {
 }
 
 static float timeCounter = 0;
-static int frameCounter;
+static int frameCounter = 0;
 static void engineDrawFrame (Engine &engine) {
     if (engine.display == NULL) {
         // No display.
@@ -122,53 +125,64 @@ static void engineDrawFrame (Engine &engine) {
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    auto shipOrientation = ship->getOrientation ();
-    vec3 dv = shipOrientation * vec3 (0, 0, 1);
-    vec3 up = shipOrientation * vec3 (0, 1, 0);
-    vec3 rt = shipOrientation * vec3 (1, 0, 0);
+    if (ast->getAsteroids ().size () == 0)
+        engine.gameState = GAME_WIN_MENU;
 
-    vec3 offset = engine.state.camRot[0] * rt - (0.5f + engine.state.camRot[1]) * up + 2.0f * dv;
-    if (!hud->getRotating ()) engine.state.camRot *= 0.95f;
+    switch (engine.gameState) {
+    case GAME_PLAYING:
+    {
+        auto shipOrientation = ship->getOrientation ();
+        vec3 dv = shipOrientation * vec3 (0, 0, 1);
+        vec3 up = shipOrientation * vec3 (0, 1, 0);
+        vec3 rt = shipOrientation * vec3 (1, 0, 0);
 
-    engine.viewMatrix = lookAt (vec3 (0), offset, up);
-    skybox->draw (engine);
+        vec3 offset = engine.state.camRot[0] * rt - (0.5f + engine.state.camRot[1]) * up + 2.0f * dv;
+        if (!hud->getRotating ()) engine.state.camRot *= 0.95f;
 
-    ship->update (engine, ast->getAsteroids ());
+        engine.viewMatrix = lookAt (vec3 (0), offset, up);
+        skybox->draw (engine);
 
-    auto shipPos = ship->getPosition ();
-    auto shipVel = ship->getVelocity ();
+        ship->update (engine, ast->getAsteroids ());
 
-    char buffer[256];
-    sprintf (buffer, "|v|=%.1fu/s", length (shipVel));
-    text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 0.8, A_PLUS, A_PLUS, buffer});
+        auto shipPos = ship->getPosition ();
+        auto shipVel = ship->getVelocity ();
 
-    if (timeCounter > 1000) {
-        sprintf (buffer, "FPS: %d", frameCounter);
-        text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 0.5, A_MINUS, A_PLUS, buffer});
-        frameCounter = 0;
-        timeCounter = 0;
+        char buffer[256];
+        sprintf (buffer, "|v|=%.1fu/s", length (shipVel));
+        text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 0.8, A_PLUS, A_PLUS, buffer});
 
-        sprintf (buffer, "p: (%.1f, %.1f, %.1f) v: (%.1f, %.1f, %.1f)",
-                 shipPos[0], shipPos[1], shipPos[2],
-                shipVel[0], shipVel[1], shipVel[2]);
-        text->addText ("pos", textUnit {vec2 (0, 1), 0.5, A_CENTER, A_PLUS, buffer});
+        if (timeCounter > 1000) {
+            sprintf (buffer, "FPS: %d", frameCounter);
+            text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 0.5, A_MINUS, A_PLUS, buffer});
+            frameCounter = 0;
+            timeCounter = 0;
+
+            sprintf (buffer, "p: (%.1f, %.1f, %.1f) v: (%.1f, %.1f, %.1f)",
+                     shipPos[0], shipPos[1], shipPos[2],
+                    shipVel[0], shipVel[1], shipVel[2]);
+            text->addText ("pos", textUnit {vec2 (0, 1), 0.5, A_CENTER, A_PLUS, buffer});
+        }
+
+
+        engine.state.eyePos = shipPos - offset;
+        vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
+        engine.viewMatrix = lookAt (engine.state.eyePos, center, up);
+
+        ast->draw (engine);
+
+        ship->draw (engine);
+
+        envp->addParticles (shipPos+ballRand (100.0f), vec3 (0), 1);
+        envp->draw (engine);
+
+        hud->draw (engine);
+        text->draw (engine);
+        break;
     }
-
-
-    engine.state.eyePos = shipPos - offset;
-    vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
-    engine.viewMatrix = lookAt (engine.state.eyePos, center, up);
-
-    ast->draw (engine);
-
-    ship->draw (engine);
-
-    envp->addParticles (shipPos+ballRand (100.0f), vec3 (0), 1);
-    envp->draw (engine);
-
-    hud->draw (engine);
-    text->draw (engine);
-
+    default:
+        menu->draw (engine);
+        break;
+    }
     eglSwapBuffers(engine.display, engine.surface);
 
     double end = now_ms ();
@@ -181,6 +195,7 @@ static void engineDrawFrame (Engine &engine) {
  * Tear down the EGL context currently associated with the display.
  */
 static void engineTermDisplay (Engine &engine) {
+    menu.reset ();
     hud.reset ();
     text.reset ();
     skybox.reset ();
@@ -217,17 +232,21 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
         auto actionIndex = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
                 >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
-        ship->setThrottle (false);
-        ship->setFire (false);
-        hud->setRotating (false);
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
             for (size_t i = 0; i < count; ++i) {
-                if (!(actionIndex == i
-                        && (actionMasked == AMOTION_EVENT_ACTION_UP
-                            || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP))) {
+                if (actionIndex == i && (actionMasked == AMOTION_EVENT_ACTION_UP
+                            || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP)) {
+                    ship->setThrottle (false);
+                    ship->setFire (false);
+                    hud->setRotating (false);
+                } else {
                     float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
                     float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
-                    hud->handleTouch (engine, *ship.get (), x, y);
+                    if (engine.gameState == GAME_PLAYING) {
+                        hud->handleTouch (engine, *ship.get (), x, y);
+                    } else {
+                        menu->handleTouch (engine, x, y);
+                    }
                 }
             }
         }
@@ -237,9 +256,22 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
         auto eventAction = AKeyEvent_getAction (event);
         if (eventAction == AKEY_EVENT_ACTION_DOWN) {
             auto eventKeyCode = AKeyEvent_getKeyCode (event);
-            if (eventKeyCode == AKEYCODE_MENU) {
-                LOGI ("Menu key was pressed!\n");
-                return 1;
+            switch (engine.gameState) {
+            case GAME_PLAYING:
+                if (eventKeyCode == AKEYCODE_MENU) {
+                    engine.gameState = GAME_PAUSE_MENU;
+                    return 1;
+                } else if (eventKeyCode == AKEYCODE_BACK) {
+                    engine.gameState = GAME_PAUSE_MENU;
+                    return 1;
+                }
+                break;
+            case GAME_PAUSE_MENU:
+                if (eventKeyCode == AKEYCODE_BACK) {
+                    engine.gameState = GAME_START_MENU;
+                    return 1;
+                }
+                break;
             }
         }
     }

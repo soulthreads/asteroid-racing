@@ -62,7 +62,7 @@ void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
 
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
-        engine.state.camRot = clamp (engine.state.camRot + 0.05f*vec2(dx, dy),
+        engine.state.camRot = clamp (0.95f*engine.state.camRot + 0.05f*vec2(dx, dy),
                                      vec2(-0.5,-0.5), vec2(0.5, 0.5));
     } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {

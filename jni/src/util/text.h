@@ -36,7 +36,7 @@ private:
     static const float symw = 16, symh = 32;
     static const int rowc = texw / symw;
     static const float factor = 1/256.0;
-    vector<GLfloat> makeSymbol (vec2 pos, float size, uint c);
+    vector<GLfloat> makeSymbol (vec2 pos, float size, uint ch);
 
     bool changed;
     void updateVertexData();

@@ -55,6 +55,16 @@ using glm::simplex;
 #include "util/assets.h"
 #include "util/shader.h"
 
+enum GameState {
+    GAME_START_MENU,
+    GAME_PLAYING,
+    GAME_WIN_MENU,
+    GAME_OVER_MENU,
+    GAME_PAUSE_MENU,
+    GAME_SELECT_MENU,
+    GAME_STATS_MENU
+};
+
 struct saved_state {
     vec3 eyePos;
     vec2 camRot;
@@ -75,6 +85,7 @@ typedef struct {
     mat4 orthoMatrix;
     mat4 viewMatrix;
     double delta;
+    GameState gameState;
     struct saved_state state;
 } Engine;
 
