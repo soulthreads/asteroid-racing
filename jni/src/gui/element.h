@@ -10,6 +10,7 @@ struct Rect {
         : x(_x), y(_y), w(_w), h(_h) {}
 };
 
+typedef function<void ()> Functor;
 class Element
 {
 protected:
@@ -20,9 +21,10 @@ protected:
     virtual void updateVertices ();
 
     string id;
+    Functor callback;
 
 public:
-    Element(Rect rect, vec4 bgColor, vec4 fgColor);
+    Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
     virtual ~Element () {}
     virtual string &getId ();
     virtual vector<textUnit> getTexts () = 0;
@@ -33,6 +35,8 @@ public:
     void setBgColor(const vec4 &value);
     vec4 getFgColor() const;
     void setFgColor(const vec4 &value);
+
+    void run ();
 
     static const int components = 2 + 4;
     static const int stride = components * sizeof (GLfloat);

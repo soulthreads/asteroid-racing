@@ -1,7 +1,7 @@
 #include "button.h"
 
-Button::Button(string label, Rect rect, vec4 bgColor, vec4 fgColor)
-    : Element (rect, bgColor, fgColor)
+Button::Button(string label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
+    : Element (rect, bgColor, fgColor, f)
 {
     text = textUnit {vec2 (r.x+r.w/2.0, r.y+r.h/2.0),
             fgColor, 1, A_CENTER, A_CENTER, label};

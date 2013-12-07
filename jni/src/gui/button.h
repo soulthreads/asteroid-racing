@@ -9,7 +9,7 @@ private:
     textUnit text;
 
 public:
-    Button(string label, Rect rect, vec4 bgColor, vec4 fgColor);
+    Button(string label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
     vector<textUnit> getTexts();
 };
 

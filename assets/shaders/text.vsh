@@ -1,6 +1,6 @@
 uniform mat4 u_MvpMatrix;
 
-uniform vec4 u_Colors[20];
+uniform vec4 u_Colors[50];
 
 attribute vec4 a_Position;
 attribute vec2 a_TexCoords;

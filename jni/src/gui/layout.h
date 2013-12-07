@@ -23,6 +23,7 @@ private:
 public:
     Layout();
     void draw ();
+    void touchDown(float x, float y);
 };
 
 #endif // GUI_H

@@ -9,7 +9,7 @@
 class Menu
 {
 private:
-    unique_ptr<Layout> startMenuL;
+    unique_ptr<Layout> startLayout;
 public:
     Menu ();
     ~Menu ();

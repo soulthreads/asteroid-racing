@@ -375,6 +375,11 @@ void android_main(struct android_app* state) {
             }
         }
 
+        if (engine.exitFlag) {
+            engine.animating = false;
+            ANativeActivity_finish (state->activity);
+            exit (0);
+        }
         if (engine.animating) {
             drawFrame();
         }

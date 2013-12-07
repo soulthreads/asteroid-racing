@@ -1,13 +1,38 @@
 #include "layout.h"
 
+#define LOG_TAG "AR_layout"
+#include "util/logs.h"
+
 Layout::Layout()
 {
     elements.push_back (unique_ptr<Element> (
-                            new Button ("Test", Rect (-0.5, 0.5, 0.5, 0.15), vec4 (0.5), vec4 (1))
+                            new Button ("Start",
+                                        Rect (-0.5, 0.3, 1, 0.2),
+                                        vec4 (0.5), vec4 (1),
+                                        [&](){
+        engine.gameState = GAME_PLAYING;
+        text->reset ();
+        ast->reset ();
+        ship->reset ();
+        for (int i = 0; i < rand ()%20 + 2; ++i)
+            ast->addAsteroid (ballRand (200.f), linearRand (2.f, 25.f));
+    })
                             ));
+
+    elements.push_back (unique_ptr<Element> (
+                            new Button ("Stats",
+                                        Rect (-0.5, 0.0, 1, 0.2),
+                                        vec4 (0.5), vec4 (1),
+                                        [&](){engine.gameState = GAME_STATS_MENU;})));
+
+    elements.push_back (unique_ptr<Element> (
+                            new Button ("Exit",
+                                        Rect (-0.5, -0.3, 1, 0.2),
+                                        vec4 (0.5), vec4 (1),
+                                        [&](){engine.exitFlag = true;})));
 }
 
-void Layout::draw()
+void Layout::draw ()
 {
     if (token != engine.token) init ();
     glUseProgram (program);
@@ -44,4 +69,13 @@ void Layout::init () {
 
     a_PositionHandle = glGetAttribLocation (program, "a_Position");
     a_ColorHandle = glGetAttribLocation (program, "a_Color");
+}
+
+void Layout::touchDown (float x, float y) {
+    for (auto &e : elements) {
+        auto r = e->getRect ();
+        if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y) && (y <= r.y+r.h)) {
+            e->run ();
+        }
+    }
 }

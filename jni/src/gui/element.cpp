@@ -33,6 +33,11 @@ void Element::setFgColor(const vec4 &value)
     fg = value;
 }
 
+void Element::run()
+{
+    callback ();
+}
+
 vector<GLfloat> &Element::getVertices()
 {
     return vertices;
@@ -51,8 +56,8 @@ void Element::updateVertices()
     };
 }
 
-Element::Element(Rect rect, vec4 bgColor, vec4 fgColor)
-    : r (rect), bg (bgColor), fg (fgColor)
+Element::Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
+    : r (rect), bg (bgColor), fg (fgColor), callback (f)
 {
     updateVertices ();
 }
