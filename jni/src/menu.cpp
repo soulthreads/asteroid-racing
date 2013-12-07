@@ -18,11 +18,11 @@ void Menu::draw()
     switch (engine.gameState) {
     case GAME_START_MENU:
         menuname = "Asteroid Racing";
-        centertext = "Нажмите в любое место экрана, чтобы начать.";
+        centertext = "Начать новую игру.";
         break;
     case GAME_PAUSE_MENU:
         menuname = "Пауза";
-        centertext = "Нажмите в любое место экрана, чтобы продолжить.";
+        centertext = "Продолжить игру.";
         break;
     case GAME_WIN_MENU:
         menuname = "Win";
@@ -36,8 +36,12 @@ void Menu::draw()
     default:
         menuname = "Something other";
     }
-    text->addText ("menuname", textUnit {vec2 (0, 1), 2, A_CENTER, A_PLUS, menuname});
-    text->addText ("start", textUnit {vec2(0,0), 1, A_CENTER, A_CENTER, centertext});
+    text->addText ("menuname", textUnit {vec2 (0, 1),
+                                         vec4 (1),
+                                         2, A_CENTER, A_PLUS, menuname});
+    text->addText ("start", textUnit {vec2(0,0),
+                                      vec4 (1),
+                                      1, A_CENTER, A_CENTER, centertext});
 
     text->draw ();
 }

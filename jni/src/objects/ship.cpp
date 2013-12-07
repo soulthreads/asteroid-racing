@@ -84,6 +84,7 @@ void Ship::update (vector<asteroid> &asteroids) {
         if (length (a.position-position) <= shipSize+a.radius*1.1f) {
             a.stamina -= length(velocity) / a.radius;
             velocity =  position - a.position;
+            engine.gameState = GAME_OVER_MENU;
         }
     }
 

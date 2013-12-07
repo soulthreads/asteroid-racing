@@ -106,7 +106,9 @@ static int engineInitDisplay (Engine &engine) {
         menu = unique_ptr<Menu> (new Menu);
         hud = unique_ptr<Hud> (new Hud);
         text = unique_ptr<Text> (new Text);
-        text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
+        text->addText ("alpha", textUnit {vec2(0, -1),
+                                          vec4(1, 1, 0, 0.1),
+                                          1, A_CENTER, A_MINUS, "alpha version"});
 
         skybox = unique_ptr<Skybox>(new Skybox);
         envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
@@ -158,20 +160,30 @@ static void drawFrame () {
 
         char buffer[256];
         sprintf (buffer, "|v|=%.1fu/s", length (shipVel));
-        text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1), 0.8, A_PLUS, A_PLUS, buffer});
+        text->addText ("speed", textUnit {vec2 (engine.aspectRatio, 1),
+                                          mix (vec4 (0, 0.5, 1, 1), vec4 (1, 0.5, 0, 1), length (shipVel) / 100.f),
+                                          0.8, A_PLUS, A_PLUS, buffer});
 
         if (timeCounter > 1000) {
             sprintf (buffer, "FPS: %d", frameCounter);
-            text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1), 0.5, A_MINUS, A_PLUS, buffer});
+            text->addText ("fps", textUnit {vec2 (-engine.aspectRatio, 1),
+                                            vec4 (0, 1, 1, 0.1),
+                                            0.8, A_MINUS, A_PLUS, buffer});
             frameCounter = 0;
             timeCounter = 0;
 
             sprintf (buffer, "p: (%.1f, %.1f, %.1f) v: (%.1f, %.1f, %.1f)",
                      shipPos[0], shipPos[1], shipPos[2],
                     shipVel[0], shipVel[1], shipVel[2]);
-            text->addText ("pos", textUnit {vec2 (0, 1), 0.5, A_CENTER, A_PLUS, buffer});
+            text->addText ("pos", textUnit {vec2 (0, 1),
+                                            vec4 (1, 1, 1, 0.5),
+                                            0.5, A_CENTER, A_PLUS, buffer});
         }
 
+        sprintf (buffer, "asteroids: %d", ast->getAsteroids ().size ());
+        text->addText ("ast", textUnit {vec2 (engine.aspectRatio, 1-0.1),
+                                        vec4 (1, 1, 1, 0.5),
+                                        0.8, A_PLUS, A_PLUS, buffer});
 
         engine.state.eyePos = shipPos - offset;
         vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
