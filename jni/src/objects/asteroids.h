@@ -4,7 +4,7 @@
 #include "engine.h"
 #include "particles.h"
 
-typedef struct {
+struct asteroid {
     GLuint vbo;
     vector<GLfloat> vertices;
     vec3 position;
@@ -14,7 +14,7 @@ typedef struct {
     float radius;
     float stamina;
     bool blownUp;
-} asteroid;
+};
 
 class Asteroids
 {

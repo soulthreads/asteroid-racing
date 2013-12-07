@@ -1,14 +1,15 @@
 #ifndef MENU_H
 #define MENU_H
 
-#include "engine.h"
-#include "util/text.h"
 #include <android_native_app_glue.h>
+#include "engine.h"
+#include "game.h"
+#include "gui/layout.h"
 
 class Menu
 {
 private:
-    unique_ptr<Text> text;
+    unique_ptr<Layout> startMenuL;
 public:
     Menu ();
     ~Menu ();

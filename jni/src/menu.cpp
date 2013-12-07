@@ -4,7 +4,7 @@
 
 Menu::Menu()
 {
-    text = unique_ptr<Text> (new Text);
+    startMenuL = unique_ptr<Layout> (new Layout);
 }
 
 Menu::~Menu()
@@ -14,9 +14,12 @@ Menu::~Menu()
 
 void Menu::draw()
 {
+    text->reset ();
+
     string menuname, centertext;
     switch (engine.gameState) {
     case GAME_START_MENU:
+        startMenuL->draw ();
         menuname = "Asteroid Racing";
         centertext = "Начать новую игру.";
         break;
@@ -57,6 +60,7 @@ void Menu::handleTouch(int actionMasked, float x, float y)
                 ast->addAsteroid (ballRand (200.f), linearRand (2.f, 25.f));
         case GAME_PAUSE_MENU:
             engine.gameState = GAME_PLAYING;
+            text->reset ();
             break;
         case GAME_WIN_MENU:
         case GAME_OVER_MENU:

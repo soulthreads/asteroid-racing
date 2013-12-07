@@ -46,10 +46,10 @@ GLuint buildProgramFromAssets (const string &vertexShaderPath, const string &fra
     return program;
 }
 
-typedef struct {
+struct PngDataHandle {
     const png_bytep data;
     png_size_t offset;
-} PngDataHandle;
+};
 
 static void readDataFromMemory (png_structp pngPtr, png_bytep out, png_size_t length) {
     PngDataHandle *handle = (PngDataHandle *)png_get_io_ptr (pngPtr);
@@ -171,9 +171,9 @@ GLuint loadCubeMapFromAssets (const string paths[]) {
     return texture;
 }
 
-typedef struct {
+struct Kd {
     GLfloat r, g, b;
-} Kd;
+};
 
 GLuint loadObjFromAssets (const string &pathToObj, const string &pathToMtl, GLuint &nvertices)
 {

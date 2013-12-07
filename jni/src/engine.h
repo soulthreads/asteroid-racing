@@ -75,7 +75,7 @@ struct saved_state {
     vec4 lightPos;
 };
 
-typedef struct {
+struct Engine {
     struct android_app* app;
 
     int token;
@@ -92,7 +92,7 @@ typedef struct {
     double delta;
     GameState gameState;
     struct saved_state state;
-} Engine;
+};
 
 extern Engine engine;
 

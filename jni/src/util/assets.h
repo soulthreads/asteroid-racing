@@ -10,16 +10,16 @@
 
 using std::string;
 
-typedef struct {
+struct FileData {
     const size_t length;
     const char *data;
     AAsset *asset;
-} FileData;
+};
 
-typedef struct {
+struct ImageData {
     unsigned char *data;
     uint32_t width, height;
-} ImageData;
+};
 
 void initAssetManager (AAssetManager *am);
 FileData getAssetData (const string &path);

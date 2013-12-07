@@ -3,11 +3,11 @@
 
 #include "engine.h"
 
-typedef struct {
+struct particle {
     vec3 position;
     vec3 velocity;
     float lifeTime;
-} particle;
+};
 
 class Particles
 {

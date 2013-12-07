@@ -13,7 +13,7 @@ Sun::~Sun()
     }
 }
 
-void Sun::init (Engine &engine) {
+void Sun::init () {
     token = engine.token;
     program = buildProgramFromAssets ("shaders/sun.vsh", "shaders/sun.fsh");
     validateProgram (program);
@@ -26,9 +26,9 @@ void Sun::init (Engine &engine) {
     sunTex = loadTextureFromAsset ("textures/sun.png");
 }
 
-void Sun::draw(Engine &engine)
+void Sun::draw()
 {
-    if (token != engine.token) init (engine);
+    if (token != engine.token) init ();
 
     glUseProgram (program);
     glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE,

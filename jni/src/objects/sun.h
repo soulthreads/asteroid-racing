@@ -19,12 +19,12 @@ private:
     float size;
 
     int token;
-    void init (Engine &engine);
+    void init ();
 
 public:
     Sun(vec3 sunPosition, float sunSize);
     ~Sun ();
-    void draw (Engine &engine);
+    void draw ();
 };
 
 #endif // SUN_H

@@ -14,7 +14,6 @@
 
 #include "menu.h"
 #include "hud.h"
-#include "util/text.h"
 #include "objects/skybox.h"
 
 #include "game.h"
