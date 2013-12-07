@@ -295,7 +295,6 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
     Engine &engine = *(Engine *)app->userData;
     switch (cmd) {
     case APP_CMD_SAVE_STATE:
-        // The system has asked us to save our current state.  Do so.
         LOGI ("Save state!");
         ship->saveState (engine);
         engine.app->savedState = malloc(sizeof(struct saved_state));
@@ -315,6 +314,7 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
         break;
     case APP_CMD_LOST_FOCUS:
         engine.animating = false;
+        if (engine.gameState == GAME_PLAYING) engine.gameState = GAME_PAUSE_MENU;
 //        engineDrawFrame(engine);
         break;
     }
@@ -326,6 +326,7 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
  * event loop for receiving input events and doing other things.
  */
 void android_main(struct android_app* state) {
+    LOGI ("entering android_main!");
     srand (time(NULL));
 
     Engine engine;

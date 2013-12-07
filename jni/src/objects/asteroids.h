@@ -44,7 +44,7 @@ private:
 
     int token;
     void init(Engine &engine);
-    void updateVBOs();
+    GLuint createVBO(vector<GLfloat> &vertices);
 
 public:
     Asteroids (Engine &engine);

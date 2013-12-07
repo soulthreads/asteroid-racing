@@ -97,11 +97,6 @@ Asteroids::Asteroids(Engine &engine)
         indexData.push_back (i[2]);
     }
 
-    for (int i = 0; i < 5; ++i) {
-        vec3 position = sphericalRand (10.f)+ballRand (100.f);
-        float radius = linearRand (2.f, 32.f);
-        addAsteroid (position, radius);
-    }
     // TODO: add bump mapping
 
     explosion = unique_ptr<Particles> (new Particles (vec3 (1, 0.5, 0.1), particlesCount,
@@ -138,7 +133,7 @@ void Asteroids::addAsteroid (vec3 position, float radius) {
         vertices.push_back (v[1]);
         vertices.push_back (v[2]);
     }
-    asteroids.push_back (asteroid {0, vertices,
+    asteroids.push_back (asteroid {createVBO (vertices), vertices,
                                    position,
                                    ballRand (2.f),
                                    angleAxis(linearRand (-1.f, 1.f), ballRand (1.f)),
@@ -164,24 +159,28 @@ void Asteroids::init (Engine &engine) {
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData (GL_ELEMENT_ARRAY_BUFFER, indexData.size () * sizeof (GLushort), indexData.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    for (auto &a : asteroids) {
+        if (a.vbo) {
+            glDeleteBuffers (1, &a.vbo);
+        }
+        a.vbo = createVBO (a.vertices);
+    }
 }
 
-void Asteroids::updateVBOs () {
-    for (auto &a : asteroids) {
-        if (a.vbo == 0) {
-            glGenBuffers (1, &a.vbo);
-            glBindBuffer (GL_ARRAY_BUFFER, a.vbo);
-            glBufferData (GL_ARRAY_BUFFER, a.vertices.size () * sizeof (GLfloat), a.vertices.data (), GL_STATIC_DRAW);
-        }
-    }
+GLuint Asteroids::createVBO (vector<GLfloat> &vertices) {
+    GLuint vbo;
+    glGenBuffers (1, &vbo);
+    glBindBuffer (GL_ARRAY_BUFFER, vbo);
+    glBufferData (GL_ARRAY_BUFFER, vertices.size () * sizeof (GLfloat), vertices.data (), GL_STATIC_DRAW);
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
+    return vbo;
 }
 
 void Asteroids::draw(Engine &engine)
 {
     if (token != engine.token) init (engine);
-    updateVBOs ();
 
     glUseProgram (program);
 
