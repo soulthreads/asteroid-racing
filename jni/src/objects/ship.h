@@ -34,14 +34,14 @@ private:
     bool fireStopping;
 
     int token;
-    void init(Engine &engine);
+    void init();
 
 public:
-    Ship (Engine &engine);
+    Ship ();
     ~Ship ();
 
-    void draw (Engine &engine);
-    void update(Engine &engine, vector<asteroid> &asteroids);
+    void draw ();
+    void update(vector<asteroid> &asteroids);
     vec3 getPosition() const;
     void setPosition(const vec3 &value);
     vec3 getVelocity() const;
@@ -50,8 +50,8 @@ public:
     void setOrientation(const quat &value);
     void setThrottle(bool value);
     void setFire(bool value);
-    void saveState(Engine &engine);
-    void restoreState(Engine &engine);
+    void saveState();
+    void restoreState();
     void reset();
 };
 

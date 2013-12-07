@@ -42,12 +42,12 @@ private:
     void updateVertexData();
 
     int token;
-    void init(const Engine &engine);
+    void init();
 
 public:
     Text ();
     ~Text ();
-    void draw (const Engine &engine);
+    void draw ();
     void addText (const string& key, const textUnit& text);
     void deleteText(const string &key);
 };

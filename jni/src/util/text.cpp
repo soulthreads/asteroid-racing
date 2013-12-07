@@ -13,7 +13,7 @@ Text::~Text()
     }
 }
 
-void Text::init (const Engine &engine) {
+void Text::init () {
     token = engine.token;
     program = buildProgramFromAssets ("shaders/text.vsh", "shaders/text.fsh");
     validateProgram (program);
@@ -56,9 +56,9 @@ vector<GLfloat> Text::makeSymbol(vec2 pos, float size, uint ch)
     return ret;
 }
 
-void Text::draw(const Engine &engine)
+void Text::draw()
 {
-    if (token != engine.token) init (engine);
+    if (token != engine.token) init ();
 
     if (changed) {
         updateVertexData ();

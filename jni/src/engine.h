@@ -22,6 +22,7 @@ using std::vector;
 using std::map;
 using std::string;
 using std::unique_ptr;
+using std::shared_ptr;
 
 using glm::vec2;
 using glm::vec3;
@@ -92,5 +93,7 @@ typedef struct {
     GameState gameState;
     struct saved_state state;
 } Engine;
+
+extern Engine engine;
 
 #endif // ENGINE_H

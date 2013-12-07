@@ -1,6 +1,8 @@
 #include "menu.h"
 
-Menu::Menu(Engine &engine)
+#include "game.h"
+
+Menu::Menu()
 {
     text = unique_ptr<Text> (new Text);
 }
@@ -10,7 +12,7 @@ Menu::~Menu()
 
 }
 
-void Menu::draw(Engine &engine)
+void Menu::draw()
 {
     string menuname, centertext;
     switch (engine.gameState) {
@@ -37,22 +39,25 @@ void Menu::draw(Engine &engine)
     text->addText ("menuname", textUnit {vec2 (0, 1), 2, A_CENTER, A_PLUS, menuname});
     text->addText ("start", textUnit {vec2(0,0), 1, A_CENTER, A_CENTER, centertext});
 
-    text->draw (engine);
+    text->draw ();
 }
 
-void Menu::handleTouch(Engine &engine, int actionMasked, float x, float y)
+void Menu::handleTouch(int actionMasked, float x, float y)
 {
-    switch (engine.gameState) {
-    case GAME_START_MENU:
-    case GAME_PAUSE_MENU:
-        if (actionMasked == AMOTION_EVENT_ACTION_DOWN)
+    if (actionMasked == AMOTION_EVENT_ACTION_DOWN) {
+        switch (engine.gameState) {
+        case GAME_START_MENU:
+            ast->reset ();
+            ship->reset ();
+            for (int i = 0; i < rand ()%20 + 2; ++i)
+                ast->addAsteroid (ballRand (200.f), linearRand (2.f, 25.f));
+        case GAME_PAUSE_MENU:
             engine.gameState = GAME_PLAYING;
-        break;
-    case GAME_WIN_MENU:
-    case GAME_OVER_MENU:
-        if (actionMasked == AMOTION_EVENT_ACTION_DOWN)
+            break;
+        case GAME_WIN_MENU:
+        case GAME_OVER_MENU:
             engine.gameState = GAME_START_MENU;
-        break;
+            break;
+        }
     }
-
 }

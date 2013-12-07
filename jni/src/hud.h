@@ -2,7 +2,6 @@
 #define HUD_H
 
 #include "engine.h"
-#include "objects/ship.h"
 
 class Hud
 {
@@ -32,13 +31,13 @@ private:
     bool rotating;
 
     int token;
-    void init(Engine &engine);
+    void init();
 
 public:
-    Hud(Engine &engine);
+    Hud ();
     ~Hud ();
-    void handleTouch (Engine &engine, Ship &ship, float x, float y);
-    void draw (Engine &engine);
+    void handleTouch (float x, float y);
+    void draw ();
     bool getRotating() const;
     void setRotating(bool value);
 };

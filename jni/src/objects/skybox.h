@@ -19,12 +19,12 @@ private:
     unique_ptr<Sun> sun;
 
     int token;
-    void init(Engine &engine);
+    void init ();
 
 public:
-    Skybox (Engine &engine);
+    Skybox ();
     ~Skybox ();
-    void draw (Engine &engine);
+    void draw ();
 };
 
 #endif // SKYBOX_H

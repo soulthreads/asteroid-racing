@@ -43,15 +43,16 @@ private:
     GLushort getMiddlePoint(GLushort p1, GLushort p2);
 
     int token;
-    void init(Engine &engine);
+    void init ();
     GLuint createVBO(vector<GLfloat> &vertices);
 
 public:
-    Asteroids (Engine &engine);
+    Asteroids ();
     ~Asteroids ();
-    void draw (Engine &engine);
+    void draw ();
     vector<asteroid> &getAsteroids();
     void addAsteroid(vec3 position, float radius);
+    void reset();
 };
 
 #endif // ASTEROID_H

@@ -87,7 +87,7 @@ GLushort Asteroids::getMiddlePoint(GLushort p1, GLushort p2)
     return index++;
 }
 
-Asteroids::Asteroids(Engine &engine)
+Asteroids::Asteroids()
 {
     createIcosphere (3);
 
@@ -141,7 +141,7 @@ void Asteroids::addAsteroid (vec3 position, float radius) {
                                    radius, 1.0, false});
 }
 
-void Asteroids::init (Engine &engine) {
+void Asteroids::init () {
     token = engine.token;
 
     program = buildProgramFromAssets ("shaders/asteroid.vsh", "shaders/asteroid.fsh");
@@ -178,9 +178,9 @@ GLuint Asteroids::createVBO (vector<GLfloat> &vertices) {
     return vbo;
 }
 
-void Asteroids::draw(Engine &engine)
+void Asteroids::draw()
 {
-    if (token != engine.token) init (engine);
+    if (token != engine.token) init ();
 
     glUseProgram (program);
 
@@ -234,10 +234,20 @@ void Asteroids::draw(Engine &engine)
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
-    explosion->draw (engine);
+    explosion->draw ();
 }
 
 vector<asteroid> &Asteroids::getAsteroids()
 {
     return asteroids;
+}
+
+void Asteroids::reset () {
+    for (auto &a : asteroids)
+        if (a.vbo)
+            glDeleteBuffers (1, &a.vbo);
+
+    asteroids.clear ();
+
+    explosion->reset ();
 }

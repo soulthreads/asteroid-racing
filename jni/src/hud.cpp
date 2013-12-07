@@ -1,6 +1,8 @@
 #include "hud.h"
 
-Hud::Hud(Engine &engine)
+#include "game.h"
+
+Hud::Hud()
 {
     stride = (2 + 2) * sizeof (GLfloat);
 
@@ -33,7 +35,7 @@ Hud::~Hud()
     }
 }
 
-void Hud::init (Engine &engine) {
+void Hud::init () {
     token = engine.token;
 
     program = buildProgramFromAssets ("shaders/hud.vsh", "shaders/hud.fsh");
@@ -51,7 +53,7 @@ void Hud::init (Engine &engine) {
 
 }
 
-void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
+void Hud::handleTouch (float x, float y)
 {
     float wx = x * engine.aspectRatio;
     if ((wx < controllerCenter[0]+controllerBgSize)
@@ -60,10 +62,10 @@ void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
         float dx = wx - controllerCenter[0];
         float dy = y - controllerCenter[1];
 
-        vec3 up = ship.getOrientation () * vec3 (0, 1, 0);
+        vec3 up = ship->getOrientation () * vec3 (0, 1, 0);
         quat xaxis = angleAxis (-5*dx, up);
         quat yaxis = angleAxis (5*dy, vec3(-1, 0, 0));
-        ship.setOrientation (normalize (xaxis * ship.getOrientation () * yaxis));
+        ship->setOrientation (normalize (xaxis * ship->getOrientation () * yaxis));
 
         controllerOffset[0] = dx;
         controllerOffset[1] = dy;
@@ -71,16 +73,16 @@ void Hud::handleTouch(Engine &engine, Ship &ship, float x, float y)
                                      vec2(-0.5,-0.5), vec2(0.5, 0.5));
     } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
-        ship.setThrottle (true);
+        ship->setThrottle (true);
     } else if ((wx > fireCenter[0] - fireSize)
                && (y < fireCenter[1] + fireSize)) {
-        ship.setFire (true);
+        ship->setFire (true);
     }
 }
 
-void Hud::draw(Engine &engine)
+void Hud::draw ()
 {
-    if (token != engine.token) init (engine);
+    if (token != engine.token) init ();
 
     glUseProgram (program);
     glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, stride, &vertexData[0]);

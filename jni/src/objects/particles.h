@@ -35,15 +35,16 @@ private:
     size_t cursor;
 
     int token;
-    void init(Engine &engine);
+    void init();
 
 public:
-    Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay);
-    ~Particles();
-    void draw (Engine &engine);
+    Particles (vec3 color, GLuint maxParticles, GLfloat size, float decay);
+    ~Particles ();
+    void draw ();
     void addParticles (vec3 position, vec3 velocity, int count);
     void setParticlesColor(const vec3 &value);
     vector<particle> &getParticles();
+    void reset();
 };
 
 #endif // PARTICLES_H

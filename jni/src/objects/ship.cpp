@@ -1,15 +1,13 @@
 #include "ship.h"
 
-using namespace std;
-
-Ship::Ship (Engine &engine) {
+Ship::Ship () {
     stride = 3 * 3 * sizeof (GLfloat);
 
     position = vec3 (0);
     velocity = vec3 (0);
     orientation = angleAxis (0.f, vec3 (0, 0, 1));
 
-    restoreState (engine);
+    restoreState ();
 
     throttle = false;
     fire = false;
@@ -27,7 +25,7 @@ Ship::~Ship () {
     }
 }
 
-void Ship::init (Engine &engine) {
+void Ship::init () {
     token = engine.token;
 
     program = buildProgramFromAssets ("shaders/ship.vsh", "shaders/ship.fsh");
@@ -44,7 +42,7 @@ void Ship::init (Engine &engine) {
     vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
 }
 
-void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
+void Ship::update (vector<asteroid> &asteroids) {
     vec3 dv = orientation * vec3 (0, 0, 1);
     vec3 up = orientation * vec3 (0, 1, 0);
     vec3 rt = orientation * vec3 (1, 0, 0);
@@ -103,8 +101,8 @@ void Ship::update (Engine &engine, vector<asteroid> &asteroids) {
     }
 }
 
-void Ship::draw(Engine &engine) {
-    if (token != engine.token) init (engine);
+void Ship::draw () {
+    if (token != engine.token) init ();
 
     glUseProgram (program);
 
@@ -135,17 +133,17 @@ void Ship::draw(Engine &engine) {
 
     glBindBuffer (GL_ARRAY_BUFFER, 0);
 
-    throttleParticles->draw (engine);
-    fireParticles->draw (engine);
+    throttleParticles->draw ();
+    fireParticles->draw ();
 }
 
-void Ship::saveState (Engine &engine) {
+void Ship::saveState () {
     engine.state.shipPosition = position;
     engine.state.shipVelocity = velocity;
     engine.state.shipOrientation = orientation;
 }
 
-void Ship::restoreState (Engine &engine) {
+void Ship::restoreState () {
     position = engine.state.shipPosition;
     velocity = engine.state.shipVelocity;
     orientation = engine.state.shipOrientation;
@@ -155,6 +153,9 @@ void Ship::reset () {
     position = vec3 (0);
     velocity = vec3 (0);
     orientation = angleAxis (0.f, vec3 (0, 0, 1));
+
+    throttleParticles->reset ();
+    fireParticles->reset ();
 }
 
 vec3 Ship::getPosition() const

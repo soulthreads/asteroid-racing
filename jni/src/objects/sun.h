@@ -17,6 +17,10 @@ private:
 
     vec3 position;
     float size;
+
+    int token;
+    void init (Engine &engine);
+
 public:
     Sun(vec3 sunPosition, float sunSize);
     ~Sun ();

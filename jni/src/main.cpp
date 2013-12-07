@@ -15,19 +15,20 @@
 #include "menu.h"
 #include "hud.h"
 #include "util/text.h"
-#include "objects/cube.h"
 #include "objects/skybox.h"
-#include "objects/ship.h"
-#include "objects/particles.h"
-#include "objects/asteroids.h"
+
+#include "game.h"
+
+Engine engine;
 
 unique_ptr<Menu> menu;
 unique_ptr<Hud> hud;
-unique_ptr<Asteroids> ast;
 unique_ptr<Skybox> skybox;
-unique_ptr<Ship> ship;
 unique_ptr<Particles> envp;
 unique_ptr<Text> text;
+
+unique_ptr<Asteroids> ast;
+unique_ptr<Ship> ship;
 
 inline static double now_ms() {
     struct timespec res;
@@ -102,20 +103,20 @@ static int engineInitDisplay (Engine &engine) {
                                       -1.0f, 1.0f, -1.0f, 1.0f);
 
     if (menu == nullptr) {
-        menu = unique_ptr<Menu> (new Menu (engine));
-        hud = unique_ptr<Hud> (new Hud (engine));
+        menu = unique_ptr<Menu> (new Menu);
+        hud = unique_ptr<Hud> (new Hud);
         text = unique_ptr<Text> (new Text);
         text->addText ("alpha", textUnit {vec2(0, -1), 1, A_CENTER, A_MINUS, "alpha version"});
 
-        skybox = unique_ptr<Skybox>(new Skybox (engine));
-        ship = unique_ptr<Ship> (new Ship (engine));
+        skybox = unique_ptr<Skybox>(new Skybox);
         envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
-        ast = unique_ptr<Asteroids> (new Asteroids (engine));
+        ast = unique_ptr<Asteroids> (new Asteroids);
+        ship = unique_ptr<Ship> (new Ship);
     }
     return 0;
 }
 
-static void engineDrawFrame (Engine &engine) {
+static void drawFrame () {
     if (engine.display == NULL) {
         // No display.
         return;
@@ -132,10 +133,7 @@ static void engineDrawFrame (Engine &engine) {
         winTimer += engine.delta;
         if (winTimer >= 5000) {
             engine.gameState = GAME_WIN_MENU;
-            for (int i = 0; i < rand ()%10 + 1; ++i)
-                ast->addAsteroid (ballRand (100.f), linearRand (2.f, 25.f));
             winTimer = 0;
-            ship->reset ();
         }
     }
 
@@ -151,9 +149,9 @@ static void engineDrawFrame (Engine &engine) {
         if (!hud->getRotating ()) engine.state.camRot *= 0.95f;
 
         engine.viewMatrix = lookAt (vec3 (0), offset, up);
-        skybox->draw (engine);
+        skybox->draw ();
 
-        ship->update (engine, ast->getAsteroids ());
+        ship->update (ast->getAsteroids ());
 
         auto shipPos = ship->getPosition ();
         auto shipVel = ship->getVelocity ();
@@ -179,22 +177,22 @@ static void engineDrawFrame (Engine &engine) {
         vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
         engine.viewMatrix = lookAt (engine.state.eyePos, center, up);
 
-        ast->draw (engine);
+        ast->draw ();
 
-        ship->draw (engine);
+        ship->draw ();
 
         envp->addParticles (shipPos+ballRand (100.0f), vec3 (0), 1);
-        envp->draw (engine);
+        envp->draw ();
 
-        hud->draw (engine);
-        text->draw (engine);
+        hud->draw ();
+        text->draw ();
 
         timeCounter += engine.delta;
         frameCounter++;
         break;
     }
     default:
-        menu->draw (engine);
+        menu->draw ();
         break;
     }
     eglSwapBuffers(engine.display, engine.surface);
@@ -247,9 +245,9 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                     float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
                     float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
                     if (engine.gameState == GAME_PLAYING) {
-                        hud->handleTouch (engine, *ship.get (), x, y);
+                        hud->handleTouch (x, y);
                     } else {
-                        menu->handleTouch (engine, actionMasked, x, y);
+                        menu->handleTouch (actionMasked, x, y);
                     }
                 }
             }
@@ -296,7 +294,7 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
     switch (cmd) {
     case APP_CMD_SAVE_STATE:
         LOGI ("Save state!");
-        ship->saveState (engine);
+        ship->saveState ();
         engine.app->savedState = malloc(sizeof(struct saved_state));
         *((struct saved_state*)engine.app->savedState) = engine.state;
         engine.app->savedStateSize = sizeof(struct saved_state);
@@ -328,8 +326,6 @@ static void engineHandleCmd (struct android_app* app, int32_t cmd) {
 void android_main(struct android_app* state) {
     LOGI ("entering android_main!");
     srand (time(NULL));
-
-    Engine engine;
 
     // Make sure glue isn't stripped.
     app_dummy();
@@ -369,7 +365,7 @@ void android_main(struct android_app* state) {
         }
 
         if (engine.animating) {
-            engineDrawFrame(engine);
+            drawFrame();
         }
     }
 }

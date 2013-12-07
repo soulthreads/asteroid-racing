@@ -3,8 +3,8 @@
 #define LOG_TAG "skybox"
 #include "util/logs.h"
 
-Skybox::Skybox(Engine &engine) {
-    init (engine);
+Skybox::Skybox() {
+    init ();
     sun = unique_ptr<Sun> (new Sun (vec3(engine.state.lightPos), engine.width/6.0));
 }
 
@@ -20,7 +20,7 @@ Skybox::~Skybox () {
     }
 }
 
-void Skybox::init (Engine &engine) {
+void Skybox::init () {
     token = engine.token;
     program = buildProgramFromAssets ("shaders/skybox.vsh", "shaders/skybox.fsh");
     validateProgram (program);
@@ -82,8 +82,8 @@ void Skybox::init (Engine &engine) {
     glBindTexture (GL_TEXTURE_CUBE_MAP, textures);
 }
 
-void Skybox::draw (Engine &engine) {
-    if (engine.token != token) init (engine);
+void Skybox::draw () {
+    if (engine.token != token) init ();
 
     glUseProgram (program);
 

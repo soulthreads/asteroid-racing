@@ -5,13 +5,10 @@ Particles::Particles(vec3 color, GLuint maxParticles, GLfloat size, float decay)
 {
     components = 3 + 1;
     stride = components * sizeof (GLfloat);
-    particle dp = {vec3 (1000), vec3 (0), 1000.0};
-    for (int i = 0; i < maxCount; ++i) {
-        particles.push_back (dp);
-    }
     vertexData.reserve (maxCount * components);
     cursor = maxCount;
 
+    reset ();
 }
 
 Particles::~Particles()
@@ -22,7 +19,16 @@ Particles::~Particles()
     }
 }
 
-void Particles::init (Engine &engine) {
+void Particles::reset () {
+    particles.clear ();
+
+    particle dp = {vec3 (1000), vec3 (0), 1000.0};
+    for (int i = 0; i < maxCount; ++i) {
+        particles.push_back (dp);
+    }
+}
+
+void Particles::init () {
     token = engine.token;
     program = buildProgramFromAssets ("shaders/particle.vsh", "shaders/particle.fsh");
     validateProgram (program);
@@ -39,9 +45,9 @@ void Particles::init (Engine &engine) {
     glBindTexture (GL_TEXTURE_2D, particleTex);
 }
 
-void Particles::draw(Engine &engine)
+void Particles::draw()
 {
-    if (token != engine.token) init (engine);
+    if (token != engine.token) init ();
 
     for (auto &p : particles) {
         p.position += p.velocity * (float)(engine.delta * 0.001);
