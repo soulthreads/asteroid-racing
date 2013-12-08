@@ -5,31 +5,6 @@
 
 Layout::Layout()
 {
-    elements.push_back (unique_ptr<Element> (
-                            new Button ("Start",
-                                        Rect (-0.5, 0.3, 1, 0.2),
-                                        vec4 (0.5), vec4 (1),
-                                        [&](){
-        engine.gameState = GAME_PLAYING;
-        text->reset ();
-        ast->reset ();
-        ship->reset ();
-        for (int i = 0; i < rand ()%20 + 2; ++i)
-            ast->addAsteroid (ballRand (200.f), linearRand (2.f, 25.f));
-    })
-                            ));
-
-    elements.push_back (unique_ptr<Element> (
-                            new Button ("Stats",
-                                        Rect (-0.5, 0.0, 1, 0.2),
-                                        vec4 (0.5), vec4 (1),
-                                        [&](){engine.gameState = GAME_STATS_MENU;})));
-
-    elements.push_back (unique_ptr<Element> (
-                            new Button ("Exit",
-                                        Rect (-0.5, -0.3, 1, 0.2),
-                                        vec4 (0.5), vec4 (1),
-                                        [&](){engine.exitFlag = true;})));
 }
 
 void Layout::draw ()
@@ -74,8 +49,12 @@ void Layout::init () {
 void Layout::touchDown (float x, float y) {
     for (auto &e : elements) {
         auto r = e->getRect ();
-        if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y) && (y <= r.y+r.h)) {
+        if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y-r.h) && (y <= r.y)) {
             e->run ();
         }
     }
+}
+
+void Layout::addButton (const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f) {
+    elements.push_back (unique_ptr<Element> (new Button (label, rect, bgColor, fgColor, f)));
 }

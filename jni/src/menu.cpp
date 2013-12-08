@@ -5,6 +5,28 @@
 Menu::Menu()
 {
     startLayout = unique_ptr<Layout> (new Layout);
+    startLayout->addButton ("Start",
+                            Rect (-0.5, 0.3, 1, 0.2),
+                            vec4 (0.5), vec4 (1),
+                            [&]()
+    {
+        engine.gameState = GAME_PLAYING;
+        text->reset ();
+        ast->reset ();
+        ship->reset ();
+        for (int i = 0; i < rand ()%20 + 2; ++i)
+            ast->addAsteroid (ballRand (200.f), linearRand (2.f, 25.f));
+    });
+
+    startLayout->addButton ("Stats",
+                            Rect (-0.5, 0.0, 1, 0.2),
+                            vec4 (0.5), vec4 (1),
+                            [&](){engine.gameState = GAME_STATS_MENU;});
+
+    startLayout->addButton ("Exit",
+                            Rect (-0.5, -0.3, 1, 0.2),
+                            vec4 (0.5), vec4 (1),
+                            [&](){engine.exitFlag = true;});
 }
 
 Menu::~Menu()
@@ -66,6 +88,7 @@ void Menu::handleTouch(int actionMasked, float x, float y)
         case GAME_WIN_MENU:
         case GAME_OVER_MENU:
         case GAME_STATS_MENU:
+        default:
             engine.gameState = GAME_START_MENU;
             break;
         }

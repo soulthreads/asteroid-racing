@@ -47,12 +47,12 @@ void Element::updateVertices()
 {
     vertices.clear ();
     vertices = {
-        r.x,     r.y+r.h, bg[0], bg[1], bg[2], bg[3],
         r.x,     r.y,     bg[0], bg[1], bg[2], bg[3],
-        r.x+r.w, r.y+r.h, bg[0], bg[1], bg[2], bg[3],
-        r.x,     r.y,     bg[0], bg[1], bg[2], bg[3],
+        r.x,     r.y-r.h, bg[0], bg[1], bg[2], bg[3],
         r.x+r.w, r.y,     bg[0], bg[1], bg[2], bg[3],
-        r.x+r.w, r.y+r.h, bg[0], bg[1], bg[2], bg[3]
+        r.x,     r.y-r.h, bg[0], bg[1], bg[2], bg[3],
+        r.x+r.w, r.y-r.h, bg[0], bg[1], bg[2], bg[3],
+        r.x+r.w, r.y,     bg[0], bg[1], bg[2], bg[3]
     };
 }
 

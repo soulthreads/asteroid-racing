@@ -24,6 +24,7 @@ public:
     Layout();
     void draw ();
     void touchDown(float x, float y);
+    void addButton(const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
 };
 
 #endif // GUI_H

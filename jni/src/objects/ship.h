@@ -25,7 +25,7 @@ private:
 
     vec3 position, velocity;
     quat orientation;
-    static const float shipSize = 0.8f;
+    float shipSize = 0.8f;
 
     bool throttle, fire;
     unique_ptr<Particles> throttleParticles;

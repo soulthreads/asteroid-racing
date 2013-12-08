@@ -11,7 +11,7 @@
 using std::string;
 
 struct FileData {
-    const size_t length;
+    const off_t length;
     const char *data;
     AAsset *asset;
 };

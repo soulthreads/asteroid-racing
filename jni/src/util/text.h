@@ -35,10 +35,10 @@ private:
     vector<GLfloat> colors;
 
     GLuint fontTex;
-    static const float texw = 512, texh = 256;
-    static const float symw = 16, symh = 32;
-    static const int rowc = texw / symw;
-    static const float factor = 1/256.0;
+    float texw = 512, texh = 256;
+    float symw = 16, symh = 32;
+    int rowc = texw / symw;
+    float factor = 1/256.0;
     vector<GLfloat> makeSymbol (vec2 pos, float colorIndex, float size, uint ch);
 
     bool changed;

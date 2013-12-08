@@ -29,7 +29,7 @@ LOCAL_SHARED_LIBRARIES := png
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
 
-LOCAL_CPPFLAGS += -O2 -std=c++11
+LOCAL_CPPFLAGS += -std=c++11
 
 include $(BUILD_SHARED_LIBRARY)
 

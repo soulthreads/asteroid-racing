@@ -247,19 +247,19 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
 
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
             for (size_t i = 0; i < count; ++i) {
-                if (actionIndex == i && (actionMasked == AMOTION_EVENT_ACTION_UP
-                            || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP)) {
-                    ship->setThrottle (false);
-                    ship->setFire (false);
-                    hud->setRotating (false);
-                } else {
-                    float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
-                    float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
-                    if (engine.gameState == GAME_PLAYING) {
-                        hud->handleTouch (x, y);
+                float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
+                float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
+                if (engine.gameState == GAME_PLAYING) {
+                    if (actionIndex == i && (actionMasked == AMOTION_EVENT_ACTION_UP
+                                             || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP)) {
+                        ship->setThrottle (false);
+                        ship->setFire (false);
+                        hud->setRotating (false);
                     } else {
-                        menu->handleTouch (actionMasked, x, y);
+                        hud->handleTouch (x, y);
                     }
+                } else {
+                    menu->handleTouch (actionMasked, x, y);
                 }
             }
         }
@@ -271,11 +271,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
             auto eventKeyCode = AKeyEvent_getKeyCode (event);
             switch (engine.gameState) {
             case GAME_PLAYING:
-                if (eventKeyCode == AKEYCODE_MENU) {
-                    engine.gameState = GAME_PAUSE_MENU;
-                    return 1;
-                }
-                if (eventKeyCode == AKEYCODE_BACK) {
+                if ((eventKeyCode == AKEYCODE_BACK) || (eventKeyCode == AKEYCODE_MENU)) {
                     engine.gameState = GAME_PAUSE_MENU;
                     return 1;
                 }
@@ -285,10 +281,13 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                     engine.gameState = GAME_PLAYING;
                     return 1;
                 }
+            case GAME_STATS_MENU:
                 if (eventKeyCode == AKEYCODE_BACK) {
                     engine.gameState = GAME_START_MENU;
                     return 1;
                 }
+                break;
+            default:
                 break;
             }
         }
