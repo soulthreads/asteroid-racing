@@ -9,12 +9,15 @@
 class Menu
 {
 private:
-    unique_ptr<Layout> startLayout;
+    vector <Layout> layouts;
+    GameState prevState;
 public:
     Menu ();
     ~Menu ();
     void draw ();
     void handleTouch (int actionMasked, float x, float y);
+    void setState (GameState state);
+    int handleKeyPress(int keyCode);
 };
 
 #endif // MENU_H

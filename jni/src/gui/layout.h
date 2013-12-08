@@ -18,13 +18,19 @@ private:
     vector<unique_ptr<Element>> elements;
     vector<GLfloat> vertices;
 
+    textUnit name;
+    int touchIndex;
+
     int token;
     void init ();
+
 public:
     Layout();
     void draw ();
-    void touchDown(float x, float y);
     void addButton(const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
+    void setName (const string& layoutName);
+    void touchDown(float x, float y);
+    void touchUp(float x, float y);
 };
 
 #endif // GUI_H

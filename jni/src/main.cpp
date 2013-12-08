@@ -105,9 +105,6 @@ static int engineInitDisplay (Engine &engine) {
         menu = unique_ptr<Menu> (new Menu);
         hud = unique_ptr<Hud> (new Hud);
         text = unique_ptr<Text> (new Text);
-        text->addText ("alpha", textUnit {vec2(0, -1),
-                                          vec4(1, 1, 0, 0.1),
-                                          1, A_CENTER, A_MINUS, "alpha version"});
 
         skybox = unique_ptr<Skybox>(new Skybox);
         envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
@@ -132,7 +129,7 @@ static void drawFrame () {
     static float winTimer = 0;
     if ((engine.gameState == GAME_PLAYING) && (ast->getAsteroids ().size () == 0)) {
         winTimer += engine.delta;
-        if (winTimer >= 5000) {
+        if (winTimer >= 2000) {
             engine.gameState = GAME_WIN_MENU;
             winTimer = 0;
         }
@@ -156,6 +153,10 @@ static void drawFrame () {
 
         auto shipPos = ship->getPosition ();
         auto shipVel = ship->getVelocity ();
+
+        text->addText ("alpha", textUnit {vec2(0, -1),
+                                          vec4(1, 1, 0, 0.1),
+                                          1, A_CENTER, A_MINUS, "alpha version"});
 
         char buffer[256];
         sprintf (buffer, "|v|=%.1fu/s", length (shipVel));
@@ -276,19 +277,8 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                     return 1;
                 }
                 break;
-            case GAME_PAUSE_MENU:
-                if (eventKeyCode == AKEYCODE_MENU) {
-                    engine.gameState = GAME_PLAYING;
-                    return 1;
-                }
-            case GAME_STATS_MENU:
-                if (eventKeyCode == AKEYCODE_BACK) {
-                    engine.gameState = GAME_START_MENU;
-                    return 1;
-                }
-                break;
             default:
-                break;
+                return menu->handleKeyPress (eventKeyCode);
             }
         }
     }

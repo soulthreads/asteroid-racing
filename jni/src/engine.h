@@ -60,12 +60,13 @@ using glm::simplex;
 
 enum GameState {
     GAME_START_MENU,
-    GAME_PLAYING,
     GAME_WIN_MENU,
     GAME_OVER_MENU,
     GAME_PAUSE_MENU,
     GAME_SELECT_MENU,
-    GAME_STATS_MENU
+    GAME_STATS_MENU,
+    GAME_PLAYING,
+    GAME_LOADING
 };
 
 struct saved_state {

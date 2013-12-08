@@ -22,6 +22,8 @@ void Layout::draw ()
         }
     }
 
+    text->addText ("name", name);
+
     glVertexAttribPointer (a_PositionHandle, 2, GL_FLOAT, GL_FALSE, Element::stride, &vertices[0]);
     glEnableVertexAttribArray (a_PositionHandle);
 
@@ -47,14 +49,31 @@ void Layout::init () {
 }
 
 void Layout::touchDown (float x, float y) {
+    touchIndex = 0;
     for (auto &e : elements) {
         auto r = e->getRect ();
         if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y-r.h) && (y <= r.y)) {
-            e->run ();
+            return;
+        }
+        touchIndex++;
+    }
+    touchIndex = -1;
+}
+
+void Layout::touchUp (float x, float y) {
+    if (touchIndex != -1) {
+        auto r = elements[touchIndex]->getRect ();
+        if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y-r.h) && (y <= r.y)) {
+            elements[touchIndex]->run ();
         }
     }
 }
 
 void Layout::addButton (const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f) {
     elements.push_back (unique_ptr<Element> (new Button (label, rect, bgColor, fgColor, f)));
+}
+
+void Layout::setName(const string &layoutName)
+{
+    name = textUnit {vec2 (0, 1), vec4 (1), 2, A_CENTER, A_PLUS, layoutName};
 }
