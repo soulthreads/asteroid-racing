@@ -10,6 +10,7 @@ private:
     int selected = 0;
     int shift = 0, maxShift = 0;
     float fshift = 0;
+    bool moved = false;
     float elementHeight = 0.2;
     bool looped = false;
     bool selectable = true;

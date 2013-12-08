@@ -31,7 +31,7 @@ vector<textUnit> List::getTexts()
 
 void List::run (float x, float y)
 {
-    if (fabs (fshift) < 0.1) {
+    if (!moved) {
         if ((y < r.y-r.h+elementHeight) && (shift < maxShift)) ++shift;
         else if ((y > r.y-elementHeight) && (shift > 0)) --shift;
         else selected = min (int (elements.size ()-1), max(0, int ((r.y-y) / elementHeight - 1 + shift)));
@@ -40,6 +40,7 @@ void List::run (float x, float y)
     }
 
     fshift = 0;
+    moved = false;
 }
 
 void List::move(float dx, float dy)
@@ -48,6 +49,7 @@ void List::move(float dx, float dy)
     if (fabs (fshift) > 1) {
         shift = min (maxShift, max (0, shift+int (fshift)));
         fshift = 0;
+        moved = true;
         updateVertices ();
     }
 }
