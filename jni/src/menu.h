@@ -11,6 +11,7 @@ class Menu
 private:
     vector <Layout> layouts;
     GameState prevState;
+    int asts = 0;
 public:
     Menu ();
     ~Menu ();

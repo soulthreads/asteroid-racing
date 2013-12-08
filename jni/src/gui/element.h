@@ -23,10 +23,13 @@ protected:
     string id;
     Functor callback;
 
+    bool scrollable = false;
+
 public:
     Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
     virtual ~Element () {}
-    virtual string &getId ();
+    string &getId ();
+    void setId (string newId);
     virtual vector<textUnit> getTexts () = 0;
     virtual vector<GLfloat> &getVertices();
     Rect getRect() const;
@@ -35,8 +38,11 @@ public:
     void setBgColor(const vec4 &value);
     vec4 getFgColor() const;
     void setFgColor(const vec4 &value);
+    bool isScrollable ();
 
-    void run ();
+    virtual void run (float x, float y);
+
+    virtual void move (float dx, float dy) {}
 
     static const int components = 2 + 4;
     static const int stride = components * sizeof (GLfloat);

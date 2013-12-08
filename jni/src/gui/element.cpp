@@ -33,7 +33,12 @@ void Element::setFgColor(const vec4 &value)
     fg = value;
 }
 
-void Element::run()
+bool Element::isScrollable()
+{
+    return scrollable;
+}
+
+void Element::run(float x, float y)
 {
     callback ();
 }
@@ -65,4 +70,8 @@ Element::Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
 string &Element::getId()
 {
     return id;
+}
+
+void Element::setId (string newId) {
+    id = newId;
 }

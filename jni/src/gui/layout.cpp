@@ -1,8 +1,5 @@
 #include "layout.h"
 
-#define LOG_TAG "AR_layout"
-#include "util/logs.h"
-
 Layout::Layout()
 {
 }
@@ -18,7 +15,7 @@ void Layout::draw ()
         auto v = e->getVertices ();
         vertices.insert (vertices.end (), v.begin(), v.end ());
         for (auto &t : e->getTexts ()) {
-            text->addText (e->getId (), t);
+            text->addText (t.text, t);
         }
     }
 
@@ -49,31 +46,59 @@ void Layout::init () {
 }
 
 void Layout::touchDown (float x, float y) {
-    touchIndex = 0;
+    int index = 0;
     for (auto &e : elements) {
         auto r = e->getRect ();
         if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y-r.h) && (y <= r.y)) {
+            touchIndex = index;
+            px = x; py = y;
             return;
         }
-        touchIndex++;
+        index++;
     }
     touchIndex = -1;
 }
 
+void Layout::touchMove (float x, float y) {
+    if ((touchIndex != -1)
+            && (touchIndex < elements.size ())
+            && elements[touchIndex]->isScrollable ()) {
+        elements[touchIndex]->move (x-px, y-py);
+        px = x; py = y;
+    }
+}
+
 void Layout::touchUp (float x, float y) {
-    if (touchIndex != -1) {
+    if ((touchIndex != -1) && (touchIndex < elements.size ())) {
         auto r = elements[touchIndex]->getRect ();
         if ((x >= r.x) && (x <= r.x+r.w) && (y >= r.y-r.h) && (y <= r.y)) {
-            elements[touchIndex]->run ();
+            elements[touchIndex]->run (x, y);
         }
     }
+    touchIndex = -1;
 }
 
 void Layout::addButton (const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f) {
     elements.push_back (unique_ptr<Element> (new Button (label, rect, bgColor, fgColor, f)));
 }
 
-void Layout::setName(const string &layoutName)
+void Layout::setName(const string layoutName)
 {
     name = textUnit {vec2 (0, 1), vec4 (1), 2, A_CENTER, A_PLUS, layoutName};
+}
+
+void Layout::addList (const string name, const vector<string> listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
+{
+    elements.push_back (unique_ptr<Element> (new List (listElements, rect, bgColor, fgColor, f)));
+    elements.back ()->setId (name);
+}
+
+Element* Layout::getById (const string id) {
+    for (auto &e : elements) {
+        if (e->getId () == id) {
+            return e.get ();
+        }
+    }
+
+    return nullptr;
 }

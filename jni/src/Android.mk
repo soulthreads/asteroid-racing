@@ -23,12 +23,14 @@ LOCAL_SRC_FILES := main.cpp \
         objects/asteroids.cpp \
         gui/element.cpp \
         gui/button.cpp \
+        gui/list.cpp \
         gui/layout.cpp
 
 LOCAL_SHARED_LIBRARIES := png
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
 
+LOCAL_CPP_FEATURES += rtti
 LOCAL_CPPFLAGS += -std=c++11
 
 include $(BUILD_SHARED_LIBRARY)

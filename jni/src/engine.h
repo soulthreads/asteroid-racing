@@ -18,6 +18,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <algorithm>
 
 using std::vector;
 using std::map;
@@ -25,6 +26,8 @@ using std::string;
 using std::unique_ptr;
 using std::shared_ptr;
 using std::function;
+using std::max;
+using std::min;
 
 using glm::vec2;
 using glm::vec3;
