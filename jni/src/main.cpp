@@ -203,6 +203,15 @@ static void drawFrame () {
         frameCounter++;
         break;
     }
+    case GAME_LOADING:
+        text->reset ();
+        text->addText ("loading", textUnit {vec2 (0, 0), vec4 (1),
+                                            2, A_CENTER, A_CENTER, "Loading..."});
+        text->draw ();
+        text->reset ();
+        hud->setRotating (false);
+        engine.gameState = GAME_PLAYING;
+        break;
     default:
         menu->draw ();
         break;

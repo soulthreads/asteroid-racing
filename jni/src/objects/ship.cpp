@@ -155,6 +155,8 @@ void Ship::reset () {
     velocity = vec3 (0);
     orientation = angleAxis (0.f, vec3 (0, 0, 1));
 
+    throttle = false;
+    fire = false;
     throttleParticles->reset ();
     fireParticles->reset ();
 }

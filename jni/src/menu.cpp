@@ -3,7 +3,7 @@
 #include "game.h"
 
 void gameStart () {
-    engine.gameState = GAME_PLAYING;
+    engine.gameState = GAME_LOADING;
     text->reset ();
     ast->reset ();
     ship->reset ();
@@ -34,7 +34,7 @@ Menu::Menu()
     layouts[GAME_PAUSE_MENU].addButton ("Resume",
                                         Rect (-0.5, 0.15, 1, 0.2),
                                         vec4 (0.5), vec4 (1),
-                                        [&](){setState (GAME_PLAYING); text->reset ();});
+                                        [&](){setState (GAME_LOADING); text->reset ();});
 
     layouts[GAME_PAUSE_MENU].addButton ("Main Menu",
                                         Rect (-0.5, -0.15, 1, 0.2),
@@ -107,7 +107,7 @@ int Menu::handleKeyPress (int keyCode) {
     switch (engine.gameState) {
     case GAME_PAUSE_MENU:
         if ((keyCode == AKEYCODE_MENU) || (keyCode == AKEYCODE_BACK)) {
-            setState (GAME_PLAYING);
+            setState (GAME_LOADING);
             text->reset ();
             return 1;
         }
