@@ -256,15 +256,15 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                 >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
         if (action != AMOTION_EVENT_ACTION_CANCEL) {
+            hud->newTouchEvent ();
             for (size_t i = 0; i < count; ++i) {
                 float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
                 float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
                 if (engine.gameState == GAME_PLAYING) {
                     if (actionIndex == i && (actionMasked == AMOTION_EVENT_ACTION_UP
                                              || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP)) {
-                        ship->setThrottle (false);
-                        ship->setFire (false);
-                        hud->setRotating (false);
+
+                        hud->touchUp (x, y);
                     } else {
                         hud->handleTouch (x, y);
                     }

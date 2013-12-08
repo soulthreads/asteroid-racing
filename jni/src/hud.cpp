@@ -53,31 +53,49 @@ void Hud::init () {
 
 }
 
+void Hud::newTouchEvent () {
+    rSet = false; tSet = false; fSet = false;
+}
+
 void Hud::handleTouch (float x, float y)
 {
     float wx = x * engine.aspectRatio;
-    if ((wx < controllerCenter[0]+controllerBgSize)
-            && (y < controllerCenter[1] + controllerBgSize)) {
+    vec2 dvec = vec2 (wx - controllerCenter[0], y - controllerCenter[1]);
+    if (((wx < controllerCenter[0]+controllerBgSize)
+            && (y < controllerCenter[1] + controllerBgSize))
+            || (rotating && length (dvec) < 2*controllerBgSize)) {
         rotating = true;
-        float dx = wx - controllerCenter[0];
-        float dy = y - controllerCenter[1];
 
+        dvec = length (dvec) > controllerBgSize ? normalize (dvec) * controllerBgSize : dvec;
         vec3 up = ship->getOrientation () * vec3 (0, 1, 0);
-        quat xaxis = angleAxis (-5*dx, up);
-        quat yaxis = angleAxis (5*dy, vec3(-1, 0, 0));
+        quat xaxis = angleAxis (-5*dvec[0], up);
+        quat yaxis = angleAxis (5*dvec[1], vec3(-1, 0, 0));
         ship->setOrientation (normalize (xaxis * ship->getOrientation () * yaxis));
 
-        controllerOffset[0] = dx;
-        controllerOffset[1] = dy;
-        engine.state.camRot = clamp (0.95f*engine.state.camRot + 0.05f*vec2(dx, dy),
+        controllerOffset = length (dvec) > controllerSize ? normalize (dvec) * controllerSize : dvec;
+        engine.state.camRot = clamp (0.95f*engine.state.camRot + 0.05f*dvec,
                                      vec2(-0.5,-0.5), vec2(0.5, 0.5));
+        rSet = true;
     } else if ((wx > throttleCenter[0] - throttleSize)
                && (y < throttleCenter[1] + throttleSize)) {
         ship->setThrottle (true);
+        tSet = true;
     } else if ((wx > fireCenter[0] - fireSize)
                && (y < fireCenter[1] + fireSize)) {
         ship->setFire (true);
+        fSet = true;
+    } else {
+        if (!rSet) rotating = false;
+        if (!tSet) ship->setThrottle (false);
+        if (!fSet) ship->setFire (false);
     }
+}
+
+void Hud::touchUp (float x, float y)
+{
+    if (!rSet) rotating = false;
+    ship->setThrottle (false);
+    ship->setFire (false);
 }
 
 void Hud::draw ()
@@ -103,12 +121,12 @@ void Hud::draw ()
     glBindTexture (GL_TEXTURE_2D, controllerBgTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
 
-    modelMatrix = translate (mat4 (1), controllerCenter+controllerOffset);
+    modelMatrix = translate (mat4 (1), controllerCenter+vec3(controllerOffset, 0));
     modelMatrix = scale (modelMatrix, vec3(controllerSize));
     glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr(engine.orthoMatrix * modelMatrix));
     glBindTexture (GL_TEXTURE_2D, controllerTex);
     glDrawArrays (GL_TRIANGLES, 0, 6);
-    controllerOffset *= 0.8f;
+    if (!rotating) controllerOffset *= 0.9f;
 
     modelMatrix = translate (mat4 (1), throttleCenter);
     modelMatrix = scale (modelMatrix, vec3 (throttleSize));
