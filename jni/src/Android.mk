@@ -16,6 +16,7 @@ LOCAL_SRC_FILES := main.cpp \
         util/shader.cpp \
         util/assets.cpp \
         util/text.cpp \
+        util/timer.cpp \
         objects/skybox.cpp \
         objects/sun.cpp \
         objects/ship.cpp \
@@ -26,8 +27,8 @@ LOCAL_SRC_FILES := main.cpp \
         gui/list.cpp \
         gui/layout.cpp
 
-LOCAL_SHARED_LIBRARIES := png
-LOCAL_STATIC_LIBRARIES := android_native_app_glue
+LOCAL_SHARED_LIBRARIES :=
+LOCAL_STATIC_LIBRARIES := android_native_app_glue png
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv2
 
 LOCAL_CPP_FEATURES += rtti

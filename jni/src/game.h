@@ -2,8 +2,10 @@
 #define GAME_H
 
 #include "util/text.h"
+#include "util/timer.h"
 #include "objects/asteroids.h"
 #include "objects/ship.h"
+
 
 extern unique_ptr<Text> text;
 extern unique_ptr<Asteroids> ast;

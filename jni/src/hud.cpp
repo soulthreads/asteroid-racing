@@ -153,3 +153,9 @@ void Hud::setRotating(bool value)
 {
     rotating = value;
 }
+
+void Hud::reset () {
+    rotating = false;
+    ship->setThrottle (false);
+    ship->setFire (false);
+}

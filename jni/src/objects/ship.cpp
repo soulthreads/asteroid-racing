@@ -16,6 +16,8 @@ Ship::Ship () {
     fireParticles = unique_ptr<Particles> (new Particles (vec3(1,0.1,0.01), 512,
                                                           engine.width/16.0, 1/1024.0));
     throttleTime = 0; fireTime = 0;
+
+    exploded = false;
 }
 
 Ship::~Ship () {
@@ -84,7 +86,13 @@ void Ship::update (vector<asteroid> &asteroids) {
         if (length (a.position-position) <= shipSize+a.radius*1.1f) {
             a.stamina -= length(velocity) / a.radius;
             velocity =  position - a.position;
-            engine.gameState = GAME_OVER_MENU;
+            engine.switchGameState = true;
+            explode ();
+            thread ([&](){
+                sleep(2);
+                engine.gameState = GAME_OVER_MENU;
+                engine.switchGameState = false;
+            }).detach();
         }
     }
 
@@ -105,34 +113,36 @@ void Ship::update (vector<asteroid> &asteroids) {
 void Ship::draw () {
     if (token != engine.token) init ();
 
-    glUseProgram (program);
+    if (!exploded) {
+        glUseProgram (program);
 
-    modelMatrix = translate (mat4(1), position) * mat4_cast(orientation);
+        modelMatrix = translate (mat4(1), position) * mat4_cast(orientation);
 
-    mvMatrix = engine.viewMatrix * modelMatrix;
-    mvpMatrix = engine.projectionMatrix * mvMatrix;
+        mvMatrix = engine.viewMatrix * modelMatrix;
+        mvpMatrix = engine.projectionMatrix * mvMatrix;
 
-    glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvpMatrix));
-    glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mvMatrix));
+        glUniformMatrix4fv (u_MvpMatrixHandle, 1, GL_FALSE, value_ptr (mvpMatrix));
+        glUniformMatrix4fv (u_MvMatrixHandle, 1, GL_FALSE, value_ptr (mvMatrix));
 
-    mat4 lightMatrix = engine.viewMatrix * translate (mat4(1), position);
-    glUniform3fv (u_LightPosHandle, 1, value_ptr (lightMatrix * engine.state.lightPos));
-    glUniform3fv (u_EyePosHandle, 1, value_ptr (engine.state.eyePos));
+        mat4 lightMatrix = engine.viewMatrix * translate (mat4(1), position);
+        glUniform3fv (u_LightPosHandle, 1, value_ptr (lightMatrix * engine.state.lightPos));
+        glUniform3fv (u_EyePosHandle, 1, value_ptr (engine.state.eyePos));
 
-    glBindBuffer (GL_ARRAY_BUFFER, vbo);
+        glBindBuffer (GL_ARRAY_BUFFER, vbo);
 
-    glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, stride, 0);
-    glEnableVertexAttribArray (a_PositionHandle);
+        glVertexAttribPointer (a_PositionHandle, 3, GL_FLOAT, GL_FALSE, stride, 0);
+        glEnableVertexAttribArray (a_PositionHandle);
 
-    glVertexAttribPointer (a_NormalHandle, 3, GL_FLOAT, GL_FALSE, stride, (void*)12);
-    glEnableVertexAttribArray (a_NormalHandle);
+        glVertexAttribPointer (a_NormalHandle, 3, GL_FLOAT, GL_FALSE, stride, (void*)12);
+        glEnableVertexAttribArray (a_NormalHandle);
 
-    glVertexAttribPointer (a_ColorHandle, 3, GL_FLOAT, GL_FALSE, stride, (void*)24);
-    glEnableVertexAttribArray (a_ColorHandle);
+        glVertexAttribPointer (a_ColorHandle, 3, GL_FLOAT, GL_FALSE, stride, (void*)24);
+        glEnableVertexAttribArray (a_ColorHandle);
 
-    glDrawArrays (GL_TRIANGLES, 0, nvertices / 3);
+        glDrawArrays (GL_TRIANGLES, 0, nvertices / 3);
 
-    glBindBuffer (GL_ARRAY_BUFFER, 0);
+        glBindBuffer (GL_ARRAY_BUFFER, 0);
+    }
 
     throttleParticles->draw ();
     fireParticles->draw ();
@@ -158,7 +168,10 @@ void Ship::reset () {
     throttle = false;
     fire = false;
     throttleParticles->reset ();
+    throttleParticles->setParticleSize (engine.width/16.0);
     fireParticles->reset ();
+
+    exploded = false;
 }
 
 vec3 Ship::getPosition() const
@@ -199,4 +212,15 @@ void Ship::setThrottle(bool value)
 void Ship::setFire(bool value)
 {
     fire = value;
+}
+
+void Ship::explode ()
+{
+    exploded = true;
+    velocity = vec3 (0);
+    throttleParticles->setParticleSize (engine.width/8.0);
+    for (int i = 0; i < 1024; ++i) {
+        throttleParticles->addParticles (position,
+                                         sphericalRand (60.f)+ballRand (40.f), 1);
+    }
 }

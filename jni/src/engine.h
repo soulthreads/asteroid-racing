@@ -19,6 +19,8 @@
 #include <memory>
 #include <functional>
 #include <algorithm>
+#include <thread>
+#include <unistd.h>
 
 using std::vector;
 using std::map;
@@ -28,6 +30,7 @@ using std::shared_ptr;
 using std::function;
 using std::max;
 using std::min;
+using std::thread;
 
 using glm::vec2;
 using glm::vec3;
@@ -98,6 +101,7 @@ struct Engine {
     mat4 viewMatrix;
     double delta;
     GameState gameState;
+    bool switchGameState;
     struct saved_state state;
 };
 

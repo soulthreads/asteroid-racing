@@ -43,6 +43,7 @@ public:
     void draw ();
     void addParticles (vec3 position, vec3 velocity, int count);
     void setParticlesColor(const vec3 &value);
+    void setParticleSize(float value);
     vector<particle> &getParticles();
     void reset();
 };

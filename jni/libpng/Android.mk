@@ -2,8 +2,6 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS += -O2
-
 LOCAL_MODULE := png
 
 LOCAL_SRC_FILES :=\
@@ -23,6 +21,6 @@ LOCAL_SRC_FILES :=\
         pngwtran.c \
         pngwutil.c
 
-LOCAL_LDLIBS += -lz
+LOCAL_EXPORT_LDLIBS += -lz
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)

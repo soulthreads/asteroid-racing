@@ -4,9 +4,11 @@
 
 void gameStart (int asts) {
     engine.gameState = GAME_LOADING;
+    engine.switchGameState = false;
     text->reset ();
     ast->reset ();
     ship->reset ();
+    timer->setInitialTime (asts * 30);
     for (int i = 0; i < asts*5; ++i)
         ast->addAsteroid (ballRand (asts * 150.f), linearRand (2.f, 25.f));
 }
@@ -119,19 +121,21 @@ void Menu::draw()
 
 void Menu::handleTouch(int actionMasked, float x, float y)
 {
-    switch (actionMasked) {
-    case AMOTION_EVENT_ACTION_DOWN:
-        layouts[engine.gameState].touchDown (x, y);
-        break;
-    case AMOTION_EVENT_ACTION_MOVE:
-        layouts[engine.gameState].touchMove (x, y);
-        break;
-    case AMOTION_EVENT_ACTION_UP:
-    case AMOTION_EVENT_ACTION_POINTER_UP:
-        layouts[engine.gameState].touchUp (x, y);
-        break;
-    default:
-        break;
+    if (engine.gameState != GAME_PLAYING) {
+        switch (actionMasked) {
+        case AMOTION_EVENT_ACTION_DOWN:
+            layouts[engine.gameState].touchDown (x, y);
+            break;
+        case AMOTION_EVENT_ACTION_MOVE:
+            layouts[engine.gameState].touchMove (x, y);
+            break;
+        case AMOTION_EVENT_ACTION_UP:
+        case AMOTION_EVENT_ACTION_POINTER_UP:
+            layouts[engine.gameState].touchUp (x, y);
+            break;
+        default:
+            break;
+        }
     }
 }
 

@@ -43,6 +43,7 @@ public:
     void setRotating(bool value);
     void newTouchEvent();
     void touchUp(float x, float y);
+    void reset();
 };
 
 #endif // HUD_H

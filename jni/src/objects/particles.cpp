@@ -28,6 +28,10 @@ void Particles::reset () {
     }
 }
 
+void Particles::setParticleSize(float value)
+{
+    particleSize = value;
+}
 void Particles::init () {
     token = engine.token;
     program = buildProgramFromAssets ("shaders/particle.vsh", "shaders/particle.fsh");

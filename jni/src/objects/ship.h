@@ -33,8 +33,12 @@ private:
     float throttleTime, fireTime;
     bool fireStopping;
 
+    bool exploded;
+
     int token;
     void init();
+
+    void explode();
 
 public:
     Ship ();

@@ -1,4 +1,5 @@
 #include "asteroids.h"
+#include "util/timer.h"
 
 void Asteroids::createIcosphere(uint subdivisions)
 {
@@ -191,9 +192,10 @@ void Asteroids::draw()
     for (auto it = asteroids.begin (); it != asteroids.end ();) {
         if (it->stamina <= 0) it->blownUp = true;
         if (it->blownUp) {
-            for (int i = 0; i < particlesCount * (it->radius/40.0); i++)
+            for (int i = 0; i < particlesCount * (it->radius/40.0); ++i)
                 explosion->addParticles (it->position+sphericalRand(it->radius),
                                          sphericalRand (60.0f) + ballRand (40.0f), 1);
+            timer->addTime (it->radius * (1-timer->getTimeLeft()/timer->getInitialTime()));
             glDeleteBuffers (1, &it->vbo);
             it = asteroids.erase (it);
         } else {

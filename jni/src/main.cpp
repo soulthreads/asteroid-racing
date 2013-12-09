@@ -25,6 +25,7 @@ unique_ptr<Hud> hud;
 unique_ptr<Skybox> skybox;
 unique_ptr<Particles> envp;
 unique_ptr<Text> text;
+unique_ptr<Timer> timer;
 
 unique_ptr<Asteroids> ast;
 unique_ptr<Ship> ship;
@@ -105,6 +106,7 @@ static int engineInitDisplay (Engine &engine) {
         menu = unique_ptr<Menu> (new Menu);
         hud = unique_ptr<Hud> (new Hud);
         text = unique_ptr<Text> (new Text);
+        timer = unique_ptr<Timer> (new Timer);
 
         skybox = unique_ptr<Skybox>(new Skybox);
         envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
@@ -126,12 +128,21 @@ static void drawFrame () {
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    static float winTimer = 0;
-    if ((engine.gameState == GAME_PLAYING) && (ast->getAsteroids ().size () == 0)) {
-        winTimer += engine.delta;
-        if (winTimer >= 2000) {
-            engine.gameState = GAME_WIN_MENU;
-            winTimer = 0;
+    if (engine.gameState == GAME_PLAYING) {
+        if ((ast->getAsteroids ().size () == 0) && !engine.switchGameState) {
+            engine.switchGameState = true;
+            thread ([&](){
+                sleep(2);
+                engine.gameState = GAME_WIN_MENU;
+                engine.switchGameState = false;
+            }).detach();
+        } else if (timer->isExpired () && !engine.switchGameState) {
+            engine.switchGameState = true;
+            thread ([&](){
+                sleep(2);
+                engine.gameState = GAME_OVER_MENU;
+                engine.switchGameState = false;
+            }).detach();
         }
     }
 
@@ -185,6 +196,16 @@ static void drawFrame () {
                                         vec4 (1, 1, 1, 0.5),
                                         0.8, A_PLUS, A_PLUS, buffer});
 
+        if (!engine.switchGameState) {
+            sprintf (buffer, "time: %.1f", timer->getTimeLeft ());
+            text->addText ("timer", textUnit {vec2 (engine.aspectRatio, 1-0.2),
+                                              timer->getTimeLeft () > 5 ?
+                                              vec4 (1, 1, 1, 0.5) : vec4 (1, 0, 0, 1),
+                                              0.8, A_PLUS, A_PLUS, buffer});
+        } else {
+            text->deleteText ("timer");
+        }
+
         engine.state.eyePos = shipPos - offset;
         vec3 center = shipPos + 3.f*dv + engine.state.camRot[0]*rt - engine.state.camRot[1] * up;
         engine.viewMatrix = lookAt (engine.state.eyePos, center, up);
@@ -201,6 +222,8 @@ static void drawFrame () {
 
         timeCounter += engine.delta;
         frameCounter++;
+
+        if (!engine.switchGameState) timer->tick ();
         break;
     }
     case GAME_LOADING:
@@ -260,7 +283,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
             for (size_t i = 0; i < count; ++i) {
                 float x = AMotionEvent_getX(event, i) * 2.0 / engine.width - 1.0;
                 float y = -(AMotionEvent_getY(event, i) * 2.0 / engine.height - 1.0);
-                if (engine.gameState == GAME_PLAYING) {
+                if ((engine.gameState == GAME_PLAYING) && !engine.switchGameState) {
                     if (actionIndex == i && (actionMasked == AMOTION_EVENT_ACTION_UP
                                              || actionMasked == AMOTION_EVENT_ACTION_POINTER_UP)) {
 
@@ -269,6 +292,7 @@ static int32_t engineHandleInput (struct android_app* app, AInputEvent* event) {
                         hud->handleTouch (x, y);
                     }
                 } else {
+                    hud->reset ();
                     menu->handleTouch (actionMasked, x, y);
                 }
             }
