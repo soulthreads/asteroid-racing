@@ -17,7 +17,7 @@ void List::setElements (const vector<string> &listElements) {
 
 vector<textUnit> List::getTexts()
 {
-    vector<textUnit> ret(0);
+    vector<textUnit> ret;
 
     float offset = elementHeight*3/2;
     for (int i = shift; (i < elements.size ()) && (offset < r.h-0.2); ++i) {
@@ -63,7 +63,7 @@ void List::updateVertices ()
     GLfloat u1 = shift > 0 ? 0.2 : -0.1;
     GLfloat u2 = (elements.size ()-shift) > r.h / elementHeight - 2 ? 0.2 : -0.1;
 
-    vector<GLfloat> tris = {
+    vector<GLfloat> tris {
         xc,      yc1+0.05f, bg[0]+u1, bg[1]+u1, bg[2]+u1, bg[3],
         xc-0.1f, yc1-0.05f, bg[0]+u1, bg[1]+u1, bg[2]+u1, bg[3],
         xc+0.1f, yc1-0.05f, bg[0]+u1, bg[1]+u1, bg[2]+u1, bg[3],
@@ -72,14 +72,14 @@ void List::updateVertices ()
         xc-0.1f, yc2+0.05f, bg[0]+u2, bg[1]+u2, bg[2]+u2, bg[3]
     };
 
-    vertices.insert (vertices.end (), tris.begin (), tris.end ());
+    vertices.insert (end (vertices), begin (tris), end (tris));
 
     if ((selected >= shift) && (selected-shift < r.h/elementHeight - 2)) {
         GLfloat yu = r.y - (selected-shift+1) * elementHeight;
         GLfloat yd = yu - elementHeight;
         GLfloat c = 0.4;
 
-        vector<GLfloat> selrect = {
+        vector<GLfloat> selrect {
             r.x,     yu, bg[0]+c, bg[1]+c, bg[2]+c, bg[3],
             r.x,     yd, bg[0]+c, bg[1]+c, bg[2]+c, bg[3],
             r.x+r.w, yu, bg[0]+c, bg[1]+c, bg[2]+c, bg[3],
@@ -88,7 +88,7 @@ void List::updateVertices ()
             r.x+r.w, yu, bg[0]+c, bg[1]+c, bg[2]+c, bg[3]
         };
 
-        vertices.insert (vertices.end (), selrect.begin (), selrect.end ());
+        vertices.insert (end (vertices), begin (selrect), end (selrect));
     }
 }
 

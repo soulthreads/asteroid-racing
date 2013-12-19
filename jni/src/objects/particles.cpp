@@ -22,9 +22,8 @@ Particles::~Particles()
 void Particles::reset () {
     particles.clear ();
 
-    particle dp = {vec3 (1000), vec3 (0), 1000.0};
     for (int i = 0; i < maxCount; ++i) {
-        particles.push_back (dp);
+        particles.push_back (particle {vec3 (1000), vec3 (0), 1000.0});
     }
 }
 

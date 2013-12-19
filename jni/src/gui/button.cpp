@@ -11,6 +11,6 @@ Button::Button(const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Funct
 
 vector<textUnit> Button::getTexts()
 {
-    vector<textUnit> ret = {text};
+    vector<textUnit> ret {text};
     return ret;
 }

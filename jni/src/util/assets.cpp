@@ -146,7 +146,7 @@ GLuint loadTextureFromAsset (const string &path) {
     return texture;
 }
 
-GLuint loadCubeMapFromAssets (const string paths[]) {
+GLuint loadCubeMapFromAssets (const vector<string> &paths) {
     GLuint texture;
     glGenTextures (1, &texture);
     assert (texture != 0);

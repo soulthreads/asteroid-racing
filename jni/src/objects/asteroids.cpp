@@ -189,7 +189,7 @@ void Asteroids::draw()
     int size;
     glGetBufferParameteriv (GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
-    for (auto it = asteroids.begin (); it != asteroids.end ();) {
+    for (auto it = begin (asteroids); it != end (asteroids);) {
         if (it->stamina <= 0) it->blownUp = true;
         if (it->blownUp) {
             for (int i = 0; i < particlesCount * (it->radius/40.0); ++i)

@@ -13,7 +13,7 @@ void Layout::draw ()
     vertices.clear ();
     for (auto &e : elements) {
         auto v = e->getVertices ();
-        vertices.insert (vertices.end (), v.begin(), v.end ());
+        vertices.insert (end (vertices), begin (v), end (v));
         for (auto &t : e->getTexts ()) {
             text->addText (t.text, t);
         }
@@ -93,12 +93,10 @@ void Layout::addList (const string name, const vector<string> listElements, Rect
     elements.back ()->setId (name);
 }
 
-Element* Layout::getById (const string id) {
+Element& Layout::getById (const string id) {
     for (auto &e : elements) {
         if (e->getId () == id) {
-            return e.get ();
+            return *e;
         }
     }
-
-    return nullptr;
 }

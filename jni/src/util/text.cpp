@@ -47,7 +47,7 @@ vector<GLfloat> Text::makeSymbol(vec2 pos, float colorIndex, float size, uint ch
     float t = (offset / rowc) * th;
 
     float pw = factor * symw, ph = factor * symh;
-    vector<GLfloat> ret = {
+    vector<GLfloat> ret {
         pos[0],         pos[1]+size*ph, s,    t,    colorIndex,
         pos[0],         pos[1],         s,    t+th, colorIndex,
         pos[0]+size*pw, pos[1]+size*ph, s+sw, t,    colorIndex,
@@ -118,7 +118,7 @@ void Text::updateVertexData ()
                 i += 2;
             }
             auto symbol = makeSymbol (pos, colorIndex, t.size, ch);
-            vertices.insert (vertices.end (), symbol.begin (), symbol.end ());
+            vertices.insert (end (vertices), begin (symbol), end (symbol));
             pos[0] += t.size * factor * symw;
         }
         colorIndex++;

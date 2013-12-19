@@ -34,7 +34,7 @@ public:
     void touchMove(float x, float y);
     void touchUp(float x, float y);
     void addList(const string name, const vector<string> listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f = []{});
-    Element *getById(const string id);
+    Element& getById(const string id);
 };
 
 #endif // GUI_H

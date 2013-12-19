@@ -28,7 +28,7 @@ void Skybox::init () {
     u_TextureUnitHandle = glGetUniformLocation (program, "u_TextureUnit");
     a_PositionHandle = glGetAttribLocation (program, "a_Position");
 
-    GLfloat skyboxVertices [] = {
+    GLfloat skyboxVertices [] {
         // front vertices
         -1.0f, -1.0f,  1.0f,
          1.0f, -1.0f,  1.0f,
@@ -41,7 +41,7 @@ void Skybox::init () {
         -1.0f,  1.0f, -1.0f
     };
 
-    GLushort skyboxElements [] = {
+    GLushort skyboxElements [] {
         // front
         2, 1, 0,
         0, 3, 2,
@@ -73,10 +73,9 @@ void Skybox::init () {
     glBindBuffer (GL_ARRAY_BUFFER, 0);
     glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    const std::string paths[] = {"textures/left.png", "textures/right.png",
-                           "textures/top.png", "textures/bottom.png",
-                           "textures/front.png", "textures/back.png"};
-    textures = loadCubeMapFromAssets (paths);
+    textures = loadCubeMapFromAssets ({"textures/left.png", "textures/right.png",
+                                       "textures/top.png", "textures/bottom.png",
+                                       "textures/front.png", "textures/back.png"});
 
     glActiveTexture (GL_TEXTURE0);
     glBindTexture (GL_TEXTURE_CUBE_MAP, textures);

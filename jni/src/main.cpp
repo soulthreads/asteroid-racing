@@ -40,7 +40,7 @@ inline static double now_ms() {
  * Initialize an EGL context for the current display.
  */
 static int engineInitDisplay (Engine &engine) {
-    const EGLint attribs[] = {
+    const EGLint attribs[] {
         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
         EGL_RED_SIZE, 8,
         EGL_GREEN_SIZE, 8,
@@ -72,7 +72,7 @@ static int engineInitDisplay (Engine &engine) {
 
     surface = eglCreateWindowSurface(display, config, engine.app->window, NULL);
 
-    const EGLint context_attribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
+    const EGLint context_attribs[] {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
     context = eglCreateContext(display, config, NULL, context_attribs);
 
     if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {

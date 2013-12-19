@@ -76,11 +76,11 @@ Menu::Menu()
                                         [&](){setState (GAME_START_MENU);});
 
     layouts[GAME_SELECT_MENU].setName ("Select level");
-    vector<string> levels = {"5 asteroids", "10 asteroids",
-                             "15 asteroids", "20 asteroids",
-                             "25 asteroids", "30 asteroids",
-                             "35 asteroids", "40 asteroids",
-                             "45 asteroids", "50 asteroids"};
+    vector<string> levels {"5 asteroids", "10 asteroids",
+                           "15 asteroids", "20 asteroids",
+                           "25 asteroids", "30 asteroids",
+                           "35 asteroids", "40 asteroids",
+                           "45 asteroids", "50 asteroids"};
     layouts[GAME_SELECT_MENU].addList ("levels", levels,
                                        Rect (-engine.aspectRatio+0.1, 0.7, 2, 1.6),
                                        vec4 (0.5), vec4 (1));
@@ -90,8 +90,8 @@ Menu::Menu()
                                          vec4 (0.5), vec4 (1),
                                          [&]()
     {
-        auto l = dynamic_cast<List*> (layouts[GAME_SELECT_MENU].getById ("levels"));
-        asts = l->getSelected ()+1;
+        auto l = dynamic_cast<List&> (layouts[GAME_SELECT_MENU].getById ("levels"));
+        asts = l.getSelected ()+1;
         gameStart (asts);
     });
     layouts[GAME_SELECT_MENU].addButton ("Main Menu",
@@ -101,7 +101,7 @@ Menu::Menu()
                                          [&](){setState (GAME_START_MENU);});
 
     layouts[GAME_STATS_MENU].setName ("Stats");
-    vector<string> stats = {"Not implemented yet."};
+    vector<string> stats {"Not implemented yet."};
     layouts[GAME_STATS_MENU].addList ("stats", stats,
                                       Rect (-engine.aspectRatio+0.1, 0.7, 2, 1.6),
                                       vec4 (0.5), vec4 (1));
