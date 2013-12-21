@@ -3,7 +3,7 @@
 
 #include "engine.h"
 
-#include "sun.h"
+class Sun;
 
 class Skybox
 {

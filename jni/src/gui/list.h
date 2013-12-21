@@ -1,7 +1,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "element.h"
+class Element;
 
 class List : public Element
 {
@@ -16,7 +16,7 @@ private:
     bool selectable = true;
     void updateVertices ();
 public:
-    List(const vector<string> &listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
+    List(const vector<string> &listElements, Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f);
     void setElements(const vector<string> &listElements);
     vector<textUnit> getTexts ();
     void run (float x, float y);

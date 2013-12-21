@@ -10,7 +10,6 @@ struct Rect {
         : x(_x), y(_y), w(_w), h(_h) {}
 };
 
-typedef function<void ()> Functor;
 class Element
 {
 protected:
@@ -21,12 +20,12 @@ protected:
     virtual void updateVertices ();
 
     string id;
-    Functor callback;
+    function<void()> callback;
 
     bool scrollable = false;
 
 public:
-    Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f);
+    Element(Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f);
     virtual ~Element () {}
     string &getId ();
     void setId (string newId);

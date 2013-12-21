@@ -2,7 +2,8 @@
 #define ASTEROID_H
 
 #include "engine.h"
-#include "particles.h"
+
+class Particles;
 
 struct asteroid {
     GLuint vbo;

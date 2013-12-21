@@ -1,4 +1,5 @@
 #include "skybox.h"
+#include "sun.h"
 
 #define LOG_TAG "skybox"
 #include "util/logs.h"

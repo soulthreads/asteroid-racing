@@ -2,8 +2,9 @@
 #define GUI_H
 
 #include "game.h"
-#include "button.h"
-#include "list.h"
+
+struct Rect;
+class Element;
 
 class Layout
 {
@@ -28,12 +29,13 @@ private:
 public:
     Layout();
     void draw ();
-    void addButton(const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f = []{});
+    void addButton(const string &label, Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f = []{});
     void setName (const string layoutName);
     void touchDown(float x, float y);
     void touchMove(float x, float y);
     void touchUp(float x, float y);
-    void addList(const string name, const vector<string> listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f = []{});
+    void addList(const string name, const vector<string> listElements,
+                 Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f = []{});
     Element& getById(const string id);
 };
 

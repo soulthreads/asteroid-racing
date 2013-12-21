@@ -17,6 +17,7 @@
 #include "objects/skybox.h"
 
 #include "game.h"
+#include "objects/particles.h"
 
 Engine engine;
 
@@ -160,7 +161,7 @@ static void drawFrame () {
         engine.viewMatrix = lookAt (vec3 (0), offset, up);
         skybox->draw ();
 
-        ship->update (ast->getAsteroids ());
+        ship->update (*ast);
 
         auto shipPos = ship->getPosition ();
         auto shipVel = ship->getVelocity ();

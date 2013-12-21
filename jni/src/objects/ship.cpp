@@ -1,4 +1,6 @@
 #include "ship.h"
+#include "particles.h"
+#include "asteroids.h"
 
 Ship::Ship () {
     stride = 3 * 3 * sizeof (GLfloat);
@@ -44,7 +46,7 @@ void Ship::init () {
     vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
 }
 
-void Ship::update (vector<asteroid> &asteroids) {
+void Ship::update (Asteroids &as) {
     vec3 dv = orientation * vec3 (0, 0, 1);
     vec3 up = orientation * vec3 (0, 1, 0);
     vec3 rt = orientation * vec3 (1, 0, 0);
@@ -82,7 +84,7 @@ void Ship::update (vector<asteroid> &asteroids) {
         if (fireStopping) fireTime -= dt * 100;
     }
 
-    for (auto &a : asteroids) {
+    for (auto &a : as.getAsteroids ()) {
         if (length (a.position-position) <= shipSize+a.radius*1.1f) {
             a.stamina -= length(velocity) / a.radius;
             velocity =  position - a.position;
@@ -100,7 +102,7 @@ void Ship::update (vector<asteroid> &asteroids) {
 
     for (auto &p : fireParticles->getParticles ()) {
         if (p.lifeTime < 10) {
-            for (auto &a : asteroids) {
+            for (auto &a : as.getAsteroids ()) {
                 if (length(a.position-p.position) <= length(p.velocity*dt)+a.radius) {
                     a.stamina -= 0.2/a.radius;
                     p.lifeTime = 1000;

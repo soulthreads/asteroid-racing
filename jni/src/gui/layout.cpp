@@ -1,4 +1,7 @@
 #include "layout.h"
+#include "element.h"
+#include "button.h"
+#include "list.h"
 
 Layout::Layout()
 {
@@ -78,7 +81,7 @@ void Layout::touchUp (float x, float y) {
     touchIndex = -1;
 }
 
-void Layout::addButton (const string &label, Rect rect, vec4 bgColor, vec4 fgColor, Functor f) {
+void Layout::addButton (const string &label, Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f) {
     elements.push_back (unique_ptr<Element> (new Button (label, rect, bgColor, fgColor, f)));
 }
 
@@ -87,7 +90,8 @@ void Layout::setName(const string layoutName)
     name = textUnit {vec2 (0, 1), vec4 (1), 2, A_CENTER, A_PLUS, layoutName};
 }
 
-void Layout::addList (const string name, const vector<string> listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
+void Layout::addList (const string name, const vector<string> listElements,
+                      Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f)
 {
     elements.push_back (unique_ptr<Element> (new List (listElements, rect, bgColor, fgColor, f)));
     elements.back ()->setId (name);

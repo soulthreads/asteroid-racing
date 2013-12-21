@@ -1,6 +1,7 @@
+#include "element.h"
 #include "list.h"
 
-List::List (const vector<string> &listElements, Rect rect, vec4 bgColor, vec4 fgColor, Functor f = []{})
+List::List (const vector<string> &listElements, Rect rect, vec4 bgColor, vec4 fgColor, function<void()> f = []{})
     : Element (rect, bgColor, fgColor, f)
 {
     id = "list";

@@ -1,4 +1,5 @@
 #include "asteroids.h"
+#include "particles.h"
 #include "util/timer.h"
 
 void Asteroids::createIcosphere(uint subdivisions)

@@ -61,7 +61,7 @@ void Element::updateVertices()
     };
 }
 
-Element::Element(Rect rect, vec4 bgColor, vec4 fgColor, Functor f)
+Element::Element(Rect rect, vec4 bgColor, vec4 fgColor, function<void ()> f)
     : r (rect), bg (bgColor), fg (fgColor), callback (f)
 {
     updateVertices ();

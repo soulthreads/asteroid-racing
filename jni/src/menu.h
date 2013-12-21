@@ -4,7 +4,8 @@
 #include <android_native_app_glue.h>
 #include "engine.h"
 #include "game.h"
-#include "gui/layout.h"
+
+class Layout;
 
 class Menu
 {

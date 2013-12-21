@@ -1,5 +1,7 @@
 #include "menu.h"
-
+#include "gui/element.h"
+#include "gui/list.h"
+#include "gui/layout.h"
 #include "game.h"
 
 void gameStart (int asts) {

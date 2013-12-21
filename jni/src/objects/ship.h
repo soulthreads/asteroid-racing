@@ -2,8 +2,9 @@
 #define SHIP_H
 
 #include "engine.h"
-#include "particles.h"
-#include "asteroids.h"
+
+class Asteroids;
+class Particles;
 
 class Ship
 {
@@ -45,7 +46,7 @@ public:
     ~Ship ();
 
     void draw ();
-    void update(vector<asteroid> &asteroids);
+    void update(Asteroids &as);
     vec3 getPosition() const;
     void setPosition(const vec3 &value);
     vec3 getVelocity() const;
