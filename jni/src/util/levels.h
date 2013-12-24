@@ -23,6 +23,8 @@ public:
     vector<string> getLevelNames ();
     vector<vec4> &getAsteroids(size_t index);
     float getTime (size_t index);
+    vec3 getStartPosition (size_t index);
+    quat getStartOrientation(size_t index);
     vec3 getFinishPosition (size_t index);
 };
 

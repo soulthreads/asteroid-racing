@@ -22,7 +22,7 @@ Ship::Ship () {
     throttleTime = 0; fireTime = 0;
 
     guideParticles = unique_ptr<Particles> (new Particles (vec3{0.1, 1, 0.1}, 10,
-                                                           engine.width/32.0, 1/512.0));
+                                                           engine.width/32.0, 1/1024.0));
     exploded = false;
 }
 

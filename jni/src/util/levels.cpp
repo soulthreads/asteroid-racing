@@ -63,6 +63,16 @@ float Levels::getTime(size_t index)
     return levels[index].time;
 }
 
+vec3 Levels::getStartPosition(size_t index)
+{
+    return levels[index].start;
+}
+
+quat Levels::getStartOrientation(size_t index)
+{
+    return levels[index].startq;
+}
+
 vec3 Levels::getFinishPosition(size_t index)
 {
     return levels[index].finish;

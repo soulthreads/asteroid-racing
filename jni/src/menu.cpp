@@ -7,6 +7,7 @@
 #include "util/levels.h"
 #include "objects/asteroids.h"
 #include "objects/ship.h"
+#include "objects/particles.h"
 
 #define LOG_TAG "AR_menu"
 #include "util/logs.h"
@@ -175,6 +176,9 @@ void Menu::gameStart (int index) {
     text->reset ();
     ast->reset ();
     ship->reset ();
+    ship->setPosition (levels->getStartPosition (index));
+    ship->setOrientation (levels->getStartOrientation (index));
+    finishParticles->reset ();
     timer->setInitialTime (levels->getTime (index));
     for (auto &v : levels->getAsteroids (index)) {
         ast->addAsteroid (vec3(v), v.w);

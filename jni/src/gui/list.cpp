@@ -6,7 +6,7 @@ List::List (const vector<string> &listElements, Rect rect, vec4 bgColor, vec4 fg
 {
     id = "list";
     elements = listElements;
-    maxShift = elements.size () - (r.h)/elementHeight+2;
+    maxShift = max (int(elements.size () - (r.h)/elementHeight+2), 0);
     scrollable = true;
 
     updateVertices ();
