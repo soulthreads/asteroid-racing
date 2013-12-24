@@ -261,3 +261,16 @@ GLuint loadObjFromAssets (const string &pathToObj, const string &pathToMtl, GLui
 
     return vbo;
 }
+
+
+vector<string> listFilesInDir(const string &path)
+{
+    vector<string> ret;
+    AAssetDir *assetDir = AAssetManager_openDir (assetManager, path.c_str ());
+    const char *filename = nullptr;
+    while ((filename = AAssetDir_getNextFileName (assetDir)) != nullptr) {
+        ret.push_back (filename);
+    }
+    AAssetDir_close (assetDir);
+    return ret;
+}

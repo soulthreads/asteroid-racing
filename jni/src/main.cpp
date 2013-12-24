@@ -17,6 +17,11 @@
 #include "objects/skybox.h"
 
 #include "game.h"
+#include "util/text.h"
+#include "util/timer.h"
+#include "util/levels.h"
+#include "objects/asteroids.h"
+#include "objects/ship.h"
 #include "objects/particles.h"
 
 Engine engine;
@@ -25,11 +30,16 @@ unique_ptr<Menu> menu;
 unique_ptr<Hud> hud;
 unique_ptr<Skybox> skybox;
 unique_ptr<Particles> envp;
+unique_ptr<Particles> finishParticles;
+
 unique_ptr<Text> text;
 unique_ptr<Timer> timer;
+unique_ptr<Levels> levels;
+size_t currentLevel;
 
 unique_ptr<Asteroids> ast;
 unique_ptr<Ship> ship;
+vec3 endPos;
 
 inline static double now_ms() {
     struct timespec res;
@@ -111,6 +121,7 @@ static int engineInitDisplay (Engine &engine) {
 
         skybox = unique_ptr<Skybox>(new Skybox);
         envp = unique_ptr<Particles> (new Particles (vec3 (1,1,0.5), 256, w/20, 1/512.0));
+        finishParticles = unique_ptr<Particles> (new Particles (vec3 {1, 0, 0}, 256, w/2, 1/512.0));
         ast = unique_ptr<Asteroids> (new Asteroids);
         ship = unique_ptr<Ship> (new Ship);
     }
@@ -129,24 +140,6 @@ static void drawFrame () {
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    if (engine.gameState == GAME_PLAYING) {
-        if ((ast->getAsteroids ().size () == 0) && !engine.switchGameState) {
-            engine.switchGameState = true;
-            thread ([&](){
-                sleep(2);
-                engine.gameState = GAME_WIN_MENU;
-                engine.switchGameState = false;
-            }).detach();
-        } else if (timer->isExpired () && !engine.switchGameState) {
-            engine.switchGameState = true;
-            thread ([&](){
-                sleep(2);
-                engine.gameState = GAME_OVER_MENU;
-                engine.switchGameState = false;
-            }).detach();
-        }
-    }
-
     switch (engine.gameState) {
     case GAME_PLAYING:
     {
@@ -161,7 +154,7 @@ static void drawFrame () {
         engine.viewMatrix = lookAt (vec3 (0), offset, up);
         skybox->draw ();
 
-        ship->update (*ast);
+        ship->update ();
 
         auto shipPos = ship->getPosition ();
         auto shipVel = ship->getVelocity ();
@@ -190,6 +183,7 @@ static void drawFrame () {
             text->addText ("pos", textUnit {vec2 (0, 1),
                                             vec4 (1, 1, 1, 0.5),
                                             0.5, A_CENTER, A_PLUS, buffer});
+            ship->guide ();
         }
 
         sprintf (buffer, "asteroids: %d", ast->getAsteroids ().size ());
@@ -218,6 +212,17 @@ static void drawFrame () {
         envp->addParticles (shipPos+ballRand (100.0f), vec3 (0), 1);
         envp->draw ();
 
+        if (!engine.switchGameState) {
+            finishParticles->setParticlesColor (
+                        mix (vec3 (1, 0.1, 0.1), vec3 (0.1, 1, 0.1),
+                             (levels->getAsteroids(currentLevel).size() - ast->getAsteroids().size())
+                             / (float) (levels->getAsteroids(currentLevel).size())));
+        } else {
+            finishParticles->setParticlesColor (vec3 (0.1, 0.5, 1));
+        }
+        finishParticles->addParticles (endPos+ballRand (10.f), ballRand (20.f), 1);
+        finishParticles->draw ();
+
         hud->draw ();
         text->draw ();
 
@@ -225,6 +230,23 @@ static void drawFrame () {
         frameCounter++;
 
         if (!engine.switchGameState) timer->tick ();
+        if ((ast->getAsteroids ().size () == 0)
+                && (length (ship->getPosition()-endPos) < length (ship->getVelocity ())*engine.delta*0.001 + 20)
+                && !engine.switchGameState) {
+            engine.switchGameState = true;
+            thread ([&](){
+                sleep(1);
+                engine.gameState = GAME_WIN_MENU;
+                engine.switchGameState = false;
+            }).detach();
+        } else if (timer->isExpired () && !engine.switchGameState) {
+            engine.switchGameState = true;
+            thread ([&](){
+                sleep(2);
+                engine.gameState = GAME_OVER_MENU;
+                engine.switchGameState = false;
+            }).detach();
+        }
         break;
     }
     case GAME_LOADING:

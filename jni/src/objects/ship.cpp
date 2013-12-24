@@ -2,6 +2,8 @@
 #include "particles.h"
 #include "asteroids.h"
 
+#include "game.h"
+
 Ship::Ship () {
     stride = 3 * 3 * sizeof (GLfloat);
 
@@ -19,6 +21,8 @@ Ship::Ship () {
                                                           engine.width/16.0, 1/1024.0));
     throttleTime = 0; fireTime = 0;
 
+    guideParticles = unique_ptr<Particles> (new Particles (vec3{0.1, 1, 0.1}, 10,
+                                                           engine.width/32.0, 1/512.0));
     exploded = false;
 }
 
@@ -46,7 +50,7 @@ void Ship::init () {
     vbo = loadObjFromAssets ("objects/ship.obj", "objects/ship.mtl", nvertices);
 }
 
-void Ship::update (Asteroids &as) {
+void Ship::update () {
     vec3 dv = orientation * vec3 (0, 0, 1);
     vec3 up = orientation * vec3 (0, 1, 0);
     vec3 rt = orientation * vec3 (1, 0, 0);
@@ -84,7 +88,8 @@ void Ship::update (Asteroids &as) {
         if (fireStopping) fireTime -= dt * 100;
     }
 
-    for (auto &a : as.getAsteroids ()) {
+    vector<asteroid> &asts = ast->getAsteroids ();
+    for (auto &a : asts) {
         if (length (a.position-position) <= shipSize+a.radius*1.1f) {
             a.stamina -= length(velocity) / a.radius;
             velocity =  position - a.position;
@@ -102,7 +107,7 @@ void Ship::update (Asteroids &as) {
 
     for (auto &p : fireParticles->getParticles ()) {
         if (p.lifeTime < 10) {
-            for (auto &a : as.getAsteroids ()) {
+            for (auto &a : asts) {
                 if (length(a.position-p.position) <= length(p.velocity*dt)+a.radius) {
                     a.stamina -= 0.2/a.radius;
                     p.lifeTime = 1000;
@@ -110,6 +115,12 @@ void Ship::update (Asteroids &as) {
             }
         }
     }
+}
+
+void Ship::guide () {
+    vector<asteroid> &asts = ast->getAsteroids ();
+    vec3 vel = velocity + 2.f*normalize ((asts.size() ? asts[0].position : endPos) - position);
+    guideParticles->addParticles (position, vel, 1);
 }
 
 void Ship::draw () {
@@ -148,6 +159,7 @@ void Ship::draw () {
 
     throttleParticles->draw ();
     fireParticles->draw ();
+    guideParticles->draw ();
 }
 
 void Ship::saveState () {

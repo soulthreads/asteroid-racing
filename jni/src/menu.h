@@ -12,7 +12,7 @@ class Menu
 private:
     vector <Layout> layouts;
     GameState prevState;
-    int asts = 0;
+    void gameStart(int index);
 public:
     Menu ();
     ~Menu ();

@@ -3,17 +3,13 @@
 #include "gui/list.h"
 #include "gui/layout.h"
 #include "game.h"
+#include "util/timer.h"
+#include "util/levels.h"
+#include "objects/asteroids.h"
+#include "objects/ship.h"
 
-void gameStart (int asts) {
-    engine.gameState = GAME_LOADING;
-    engine.switchGameState = false;
-    text->reset ();
-    ast->reset ();
-    ship->reset ();
-    timer->setInitialTime (asts * 30);
-    for (int i = 0; i < asts*5; ++i)
-        ast->addAsteroid (ballRand (asts * 150.f), linearRand (2.f, 25.f));
-}
+#define LOG_TAG "AR_menu"
+#include "util/logs.h"
 
 Menu::Menu()
 {
@@ -49,7 +45,11 @@ Menu::Menu()
     layouts[GAME_WIN_MENU].addButton ("Next level",
                                         Rect (-0.5, 0.3, 1, 0.2),
                                         vec4 (0.5), vec4 (1),
-                                        [&](){gameStart (++asts);});
+                                        [&]()
+    {
+        if (++currentLevel < levels->size ())
+            gameStart (currentLevel);
+    });
 
     layouts[GAME_WIN_MENU].addButton ("Stats",
                                         Rect (-0.5, 0.0, 1, 0.2),
@@ -65,7 +65,7 @@ Menu::Menu()
     layouts[GAME_OVER_MENU].addButton ("Restart",
                                         Rect (-0.5, 0.3, 1, 0.2),
                                         vec4 (0.5), vec4 (1),
-                                        [&](){gameStart (asts);});
+                                        [&](){gameStart (currentLevel);});
 
     layouts[GAME_OVER_MENU].addButton ("Stats",
                                         Rect (-0.5, 0.0, 1, 0.2),
@@ -77,13 +77,9 @@ Menu::Menu()
                                         vec4 (0.5), vec4 (1),
                                         [&](){setState (GAME_START_MENU);});
 
+    levels = unique_ptr<Levels> (new Levels);
     layouts[GAME_SELECT_MENU].setName ("Select level");
-    vector<string> levels {"5 asteroids", "10 asteroids",
-                           "15 asteroids", "20 asteroids",
-                           "25 asteroids", "30 asteroids",
-                           "35 asteroids", "40 asteroids",
-                           "45 asteroids", "50 asteroids"};
-    layouts[GAME_SELECT_MENU].addList ("levels", levels,
+    layouts[GAME_SELECT_MENU].addList ("levels", levels->getLevelNames (),
                                        Rect (-engine.aspectRatio+0.1, 0.7, 2, 1.6),
                                        vec4 (0.5), vec4 (1));
     layouts[GAME_SELECT_MENU].addButton ("Start",
@@ -93,8 +89,8 @@ Menu::Menu()
                                          [&]()
     {
         auto l = dynamic_cast<List&> (layouts[GAME_SELECT_MENU].getById ("levels"));
-        asts = l.getSelected ()+1;
-        gameStart (asts);
+        currentLevel = l.getSelected ();
+        gameStart (currentLevel);
     });
     layouts[GAME_SELECT_MENU].addButton ("Main Menu",
                                          Rect (-engine.aspectRatio+2.2, 0.4,
@@ -107,6 +103,7 @@ Menu::Menu()
     layouts[GAME_STATS_MENU].addList ("stats", stats,
                                       Rect (-engine.aspectRatio+0.1, 0.7, 2, 1.6),
                                       vec4 (0.5), vec4 (1));
+
 }
 
 Menu::~Menu()
@@ -170,4 +167,17 @@ void Menu::setState(GameState state)
 {
     prevState = engine.gameState;
     engine.gameState = state;
+}
+
+void Menu::gameStart (int index) {
+    engine.gameState = GAME_LOADING;
+    engine.switchGameState = false;
+    text->reset ();
+    ast->reset ();
+    ship->reset ();
+    timer->setInitialTime (levels->getTime (index));
+    for (auto &v : levels->getAsteroids (index)) {
+        ast->addAsteroid (vec3(v), v.w);
+    }
+    endPos = levels->getFinishPosition (index);
 }

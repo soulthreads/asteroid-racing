@@ -17,6 +17,7 @@ LOCAL_SRC_FILES := main.cpp \
         util/assets.cpp \
         util/text.cpp \
         util/timer.cpp \
+        util/levels.cpp \
         objects/skybox.cpp \
         objects/sun.cpp \
         objects/ship.cpp \

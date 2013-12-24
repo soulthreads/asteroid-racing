@@ -36,4 +36,6 @@ GLuint loadCubeMapFromAssets (const vector<string> &paths);
 
 GLuint loadObjFromAssets (const string &pathToObj, const string &pathToMtl, GLuint &nvertices);
 
+vector<string> listFilesInDir (const string &path);
+
 #endif // ASSETS_H

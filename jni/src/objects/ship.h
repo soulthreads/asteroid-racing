@@ -34,6 +34,8 @@ private:
     float throttleTime, fireTime;
     bool fireStopping;
 
+    unique_ptr<Particles> guideParticles;
+
     bool exploded;
 
     int token;
@@ -46,7 +48,7 @@ public:
     ~Ship ();
 
     void draw ();
-    void update(Asteroids &as);
+    void update();
     vec3 getPosition() const;
     void setPosition(const vec3 &value);
     vec3 getVelocity() const;
@@ -58,6 +60,7 @@ public:
     void saveState();
     void restoreState();
     void reset();
+    void guide();
 };
 
 #endif // SHIP_H

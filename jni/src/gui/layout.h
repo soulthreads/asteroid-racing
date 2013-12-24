@@ -1,10 +1,13 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include "GLES2/gl2.h"
 #include "game.h"
+#include "util/text.h"
 
 struct Rect;
 class Element;
+using std::vector;
 
 class Layout
 {

@@ -1,6 +1,7 @@
 #include "hud.h"
 
 #include "game.h"
+#include "objects/ship.h"
 
 Hud::Hud()
 {
