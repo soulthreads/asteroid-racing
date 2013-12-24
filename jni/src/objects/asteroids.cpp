@@ -137,7 +137,7 @@ void Asteroids::addAsteroid (vec3 position, float radius) {
     }
     asteroids.push_back (asteroid {createVBO (vertices), vertices,
                                    position,
-                                   ballRand (2.f),
+                                   ballRand (1.f),
                                    angleAxis(linearRand (-1.f, 1.f), ballRand (1.f)),
                                    angleAxis(linearRand (.5f, .5f), ballRand (1.f)),
                                    radius, 1.0, false});
